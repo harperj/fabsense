@@ -1,0 +1,2 @@
+Header: hammer hammer 5 1 
+timestamp, accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ

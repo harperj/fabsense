@@ -25,6 +25,8 @@ num_good = 0
 num_bad = 0
 num_skip = 0
 
+testnum = 10;
+
 ### added video recording initialization
 # camera = cv2.VideoCapture(0)
 # fps = 25
@@ -46,8 +48,8 @@ num_skip = 0
 # f.write(str("Header: " + tool + " " + act + " " + rep + " " + trl + " ")  + "\n")
 
 
-print "Filename testVideo-6.txt"
-f = open("testNoVideo-5.txt", "w")
+print "Filename testVideo-" + str(testnum) + ".txt"
+f = open("testVideo-" + str(testnum) + ".txt", "w")
 f.write(str("timestamp, accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ") + "\n")
 
 

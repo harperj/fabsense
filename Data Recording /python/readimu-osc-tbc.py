@@ -14,39 +14,42 @@ length = 20
 temp   = [0] * (length)
 last = float(0)
 #window   = collections.deque(maxlen = 9)
-windows = []
-for i in xrange(9): windows.append(deque(maxlen = 9))
+#windows = []
+#for i in xrange(9): windows.append(deque(maxlen = 9))
 #window = np.zeros(25).reshape((9, 5))
 
 
 
-def log(data, client, csvwriter):
+def log(data, client, csvwriter, graph):
   row = []
-  i = 0; j = 0; tempData = 0.;
+  #i = 0; j = 0; 
+  tempData = 0.;
   row.append(str(time.time()))
   for sensor, setting in gina.iteritems():
     for axis, index in setting["data"].iteritems():
-        msg = OSC.OSCMessage()
-        msg.setAddress(setting["name"] + "/" + axis)
+        msg = OSC.OSCMessage()                            if graph else ""
+        msg.setAddress(setting["name"] + "/" + axis)      if graph else ""
         tempData = float(data[index]) / setting["scale"]
-        msg.append(tempData)
-        client.send(msg)
+        msg.append(tempData)                              if graph else ""
+        client.send(msg)                                  if graph else ""
         row.append(tempData)
-     #   makeWindow(tempData, i+j)
+    #   makeWindow(tempData, i+j)
     #     print i+j
     #     j += 1
     # j = 0
     # i += 1
 
   #pseudocode: makeWindow(transpose(row(1:)))
+  #print row
+
   csvwriter.writerow(row)
 
-def makeWindow(tempData, position):
+#def makeWindow(tempData, position):
   #pseudocode for i in windows: windows[i].append(row[i])
   #averageing kernel: [.2, .2, .2, .2, .2]
   #derivative kernal
   #pseudocode 
-  windows[position].append(tempData)
+  #windows[position].append(tempData)
 
   #window[position][index] = tempData
 
@@ -87,7 +90,7 @@ def getSlope(num):
     last = num;
     return 0;
 
-def read(filename, verbose):
+def read(filename, verbose, graph):
   num_good = 0
   num_bad = 0
   num_skip = 0
@@ -109,7 +112,7 @@ def read(filename, verbose):
     n = 0
     oldarr = []
 
-    [client, m] = sniff(header, format, verbose);
+    [client, m] = sniff(header, format, verbose, graph);
 
     while not done:
       try:
@@ -136,7 +139,7 @@ def read(filename, verbose):
             split = s.split(" ")
 
        
-            log(split, client, csvwriter)
+            log(split, client, csvwriter, graph)
 
             n = arr['n']
             oldarr = arr
@@ -161,14 +164,14 @@ def read(filename, verbose):
 
   #curses.endwin()
 
-def sniff(header, format, verbose):
+def sniff(header, format, verbose, graph):
   m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1431", debug=False)
   startup(m)
 
-  sys.stderr.write( "Starting up OSC...\n") if verbose else ""
-  client = OSC.OSCClient()
-  client.connect( ('127.0.0.1', 8000) ) # note that the argument is a tupple and not two arguments
-  sys.stderr.write( "Sniffing...\n") if verbose else ""
+  sys.stderr.write( "Starting up OSC...\n")         if verbose else ""
+  client = OSC.OSCClient()                          if graph else ""
+  client.connect( ('127.0.0.1', 8000) )             if graph else "" # note that the argument is a tupple and not two arguments
+  sys.stderr.write( "Sniffing...\n")                if verbose else ""
   print "ts " + header
 
 
@@ -181,8 +184,6 @@ def sniff(header, format, verbose):
     pass
 
   return client, m
-if __name__ == "__main__":
-  main(sys.argv[1:])
 
 
 
@@ -216,4 +217,7 @@ def main(argv):
   path = directory + "1" + "/"
   filename = "data.csv"
 
-  read(path + filename, verbose)
+  read(path + filename, verbose,graph)
+
+if __name__ == "__main__":
+  main(sys.argv[1:])

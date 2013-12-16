@@ -8,29 +8,35 @@ import OSC, random,curses
 import numpy as np
 
 global last
-global window
-
-window = 20
 
 length = 20
 temp   = [0] * (length)
 last = float(0)
-
+window = np.zeros(25).reshape((9, 5))
 
 
 def log(data, client, csvwriter):
   row = []
+  i = 0; j = 0; tempData = 0.;
   row.append(str(time.time()))
   for sensor, setting in gina.iteritems():
     for axis, index in setting["data"].iteritems():
-        # pass;
         msg = OSC.OSCMessage()
         msg.setAddress(setting["name"] + "/" + axis)
-        msg.append(float(data[index]) / setting["scale"])
+        tempData = float(data[index]) / setting["scale"]
+        msg.append(tempData)
         client.send(msg)
-        row.append(float(data[index]) / setting["scale"])
+        row.append(tempData)
+
+        window[i+j][1] = tempData
+        j += 1
+    j = 0
+    i += 1
   csvwriter.writerow(row)
-  
+
+def buffer(tempData, ):
+
+
 
 
 def startup(m):
@@ -171,8 +177,9 @@ def main(argv):
 
   outputfile = ''
   verbose = False
+  graph = False
   try:
-    opts, args = getopt.getopt(argv,"ho:v",["ofile=","verbose="])
+    opts, args = getopt.getopt(argv,"ho:v",["ofile=","verbose=","graph="])
   except getopt.GetoptError:
     print 'test.py -o <outputfile>'
     sys.exit(2)
@@ -184,6 +191,8 @@ def main(argv):
        outputfile = arg
     elif opt in ("-v","--verbose"):
       verbose  = True
+    elif opt in ("-g","--graph"):
+      graph = True
 
   print 'Output file is "', outputfile
   if verbose :

@@ -1,4 +1,4 @@
-import cv2 
+bkimport cv2 
 import time, sys
 
 testnum = 10;

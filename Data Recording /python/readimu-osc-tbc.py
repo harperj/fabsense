@@ -8,11 +8,11 @@ from collections import deque
 import OSC, random,curses
 import numpy as np
 
-global last
+#global last
 
-length = 20
+length = 19
 temp   = [0] * (length)
-last = float(0)
+#last = float(0)
 #window   = collections.deque(maxlen = 9)
 #windows = []
 #for i in xrange(9): windows.append(deque(maxlen = 9))
@@ -41,17 +41,24 @@ def log(data, client, csvwriter, graph):
 
   #pseudocode: makeWindow(transpose(row(1:)))
   #print row
-
+  makeWindow(row[4:7])
   csvwriter.writerow(row)
 
-#def makeWindow(tempData, position):
+def makeWindow(data):
   #pseudocode for i in windows: windows[i].append(row[i])
   #averageing kernel: [.2, .2, .2, .2, .2]
   #derivative kernal
-  #pseudocode 
+  #pseudocode  
   #windows[position].append(tempData)
+  gyro = np.array(data)
+  magnitude = np.sqrt(gyro.dot(gyro))
+  temp.append(magnitude)
+  temp.pop(0)
+
+  #np.convolve(temp,[])
 
   #window[position][index] = tempData
+
 
 
 
@@ -77,18 +84,17 @@ def end(m):
 def mAvg(num):
   temp.append(num)
   temp.pop(0)
-  # print "You've made it this far: " + str(temp)
   return sum(temp)/float(length)
 
-def getSlope(num):
-  if (num >= last):
-    global last 
-    last = num
-    return 1;
-  else:
-    global last 
-    last = num;
-    return 0;
+# def getSlope(num):
+#   if (num >= last):
+#     global last 
+#     last = num
+#     return 1;
+#   else:
+#     global last 
+#     last = num;
+#     return 0;
 
 def read(filename, verbose, graph):
   num_good = 0
@@ -194,7 +200,7 @@ def main(argv):
   verbose = False
   graph = False
   try:
-    opts, args = getopt.getopt(argv,"ho:v",["ofile=","verbose=","graph="])
+    opts, args = getopt.getopt(argv,"ho:gv",["ofile=","verbose","graph"])
   except getopt.GetoptError:
     print 'test.py -o <outputfile>'
     sys.exit(2)

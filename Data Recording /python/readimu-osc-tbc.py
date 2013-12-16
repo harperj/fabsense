@@ -10,7 +10,7 @@ import numpy as np
 
 #global last
 
-length = 19
+length = 5
 temp   = [0] * (length)
 #last = float(0)
 #window   = collections.deque(maxlen = 9)
@@ -20,7 +20,7 @@ temp   = [0] * (length)
 
 
 
-def log(data, client, csvwriter, graph):
+def log(data, client, csvwriter):
   row = []
   #i = 0; j = 0; 
   tempData = 0.;
@@ -41,21 +41,31 @@ def log(data, client, csvwriter, graph):
 
   #pseudocode: makeWindow(transpose(row(1:)))
   #print row
-  makeWindow(row[4:7])
+  makeWindow(row[4:7], client)
   csvwriter.writerow(row)
 
-def makeWindow(data):
+def plotOSC(client, address, data):
+  if graph:
+    msg = OSC.OSCMessage() 
+    msg.setAddress(str(address))
+    msg.append(data)
+    client.send(msg)
+
+
+def makeWindow(data, client):
   #pseudocode for i in windows: windows[i].append(row[i])
   #averageing kernel: [.2, .2, .2, .2, .2]
   #derivative kernal
   #pseudocode  
   #windows[position].append(tempData)
+  average = [.2, .2, .2, .2, .2]
   gyro = np.array(data)
   magnitude = np.sqrt(gyro.dot(gyro))
   temp.append(magnitude)
   temp.pop(0)
+  smooth = np.convolve(temp,average,'valid')
+  plotOSC(client,'/mAvg/gyro',smooth)
 
-  #np.convolve(temp,[])
 
   #window[position][index] = tempData
 
@@ -145,7 +155,7 @@ def read(filename, verbose, graph):
             split = s.split(" ")
 
        
-            log(split, client, csvwriter, graph)
+            log(split, client, csvwriter)
 
             n = arr['n']
             oldarr = arr
@@ -198,6 +208,7 @@ def main(argv):
 
   outputfile = ''
   verbose = False
+  global graph 
   graph = False
   try:
     opts, args = getopt.getopt(argv,"ho:gv",["ofile=","verbose","graph"])

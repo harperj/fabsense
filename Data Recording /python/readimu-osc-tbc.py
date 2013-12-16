@@ -20,22 +20,23 @@ class SensorWindows(object):
         self.length = window_length
         self.windows = []
         for i in xrange(num_windows):
-            windows.append(numpy.zeros(window_length, dtype='f'))
+            self.windows.append(np.zeros(window_length, dtype='f'))
         
         self.num_windows = num_windows
         self.index = 0
         
     def addValues(self, vals):
-        if len(vals) != num_windows:
+        if len(vals) != self.num_windows:
             print "ERROR: Number of values not equal to number of windows."
             return
         else:
-            for i in xrange(num_windows):
-                windows[i][index] = vals[i]
-                index = (index + 1) % length
+            for i in xrange(self.num_windows):
+                self.windows[i][self.index] = vals[i]
+            self.index = (self.index + 1) % self.length
+    
+    def get(self):
+        return self.windows
                 
-    def nextIndex(self):
-        index = (index + 1) % length
 
 def log(data, client, csvwriter):
   row = []
@@ -95,12 +96,11 @@ def mAvg(num):
   return sum(temp)/float(length)
 
 def getSlope(num):
+  global last 
   if (num >= last):
-    global last 
     last = num
     return 1;
   else:
-    global last 
     last = num;
     return 0;
 

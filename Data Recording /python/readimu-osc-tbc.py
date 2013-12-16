@@ -4,6 +4,7 @@ import time, sys, getopt, csv
 import lib.motetalk as motetalk
 from lib.motetalk import cmd, packetify, setpwm
 from array import array
+from collections import deque
 import OSC, random,curses
 import numpy as np
 
@@ -12,7 +13,11 @@ global last
 length = 20
 temp   = [0] * (length)
 last = float(0)
-window = np.zeros(25).reshape((9, 5))
+#window   = collections.deque(maxlen = 9)
+windows = []
+for i in xrange(9): windows.append(deque(maxlen = 9))
+#window = np.zeros(25).reshape((9, 5))
+
 
 
 def log(data, client, csvwriter):
@@ -27,14 +32,23 @@ def log(data, client, csvwriter):
         msg.append(tempData)
         client.send(msg)
         row.append(tempData)
+     #   makeWindow(tempData, i+j)
+    #     print i+j
+    #     j += 1
+    # j = 0
+    # i += 1
 
-        window[i+j][1] = tempData
-        j += 1
-    j = 0
-    i += 1
+  #pseudocode: makeWindow(transpose(row(1:)))
   csvwriter.writerow(row)
 
-def buffer(tempData, ):
+def makeWindow(tempData, position):
+  #pseudocode for i in windows: windows[i].append(row[i])
+  #averageing kernel: [.2, .2, .2, .2, .2]
+  #derivative kernal
+  #pseudocode 
+  windows[position].append(tempData)
+
+  #window[position][index] = tempData
 
 
 

@@ -34,9 +34,11 @@ class SensorWindows(object):
                 self.windows[i][self.index] = vals[i]
             self.index = (self.index + 1) % self.length
     
-    def get(self):
-        return self.windows
-                
+    def get(self, window_ind = -1):
+        if window_ind == -1:
+            return self.windows
+        else:
+            return self.windows[window_ind]    
 
 def log(data, client, csvwriter):
   row = []

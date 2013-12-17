@@ -9,8 +9,9 @@ import OSC, random,curses
 import numpy as np
 
 #global last
+global length 
 
-length = 5
+length = 10
 temp   = [0] * (length)
 #last = float(0)
 #window   = collections.deque(maxlen = 9)
@@ -58,9 +59,11 @@ def makeWindow(data, client):
   #derivative kernal
   #pseudocode  
   #windows[position].append(tempData)
-  average = [.2, .2, .2, .2, .2]
+  # average = [.2, .2, .2, .2, .2]
+  average = [1/float(length)] * length
   gyro = np.array(data)
   magnitude = np.sqrt(gyro.dot(gyro))
+  plotOSC(client,'/net/gyro',magnitude)
   temp.append(magnitude)
   temp.pop(0)
   smooth = np.convolve(temp,average,'valid')

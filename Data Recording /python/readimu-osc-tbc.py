@@ -19,7 +19,30 @@ temp   = [0] * (length)
 #for i in xrange(9): windows.append(deque(maxlen = 9))
 #window = np.zeros(25).reshape((9, 5))
 
-
+class SensorWindows(object):
+    def __init__(self, num_windows=9, window_length=9):
+        self.length = window_length
+        self.windows = []
+        for i in xrange(num_windows):
+            self.windows.append(np.zeros(window_length, dtype='f'))
+        
+        self.num_windows = num_windows
+        self.index = 0
+        
+    def addValues(self, vals):
+        if len(vals) != self.num_windows:
+            print "ERROR: Number of values not equal to number of windows."
+            return
+        else:
+            for i in xrange(self.num_windows):
+                self.windows[i][self.index] = vals[i]
+            self.index = (self.index + 1) % self.length
+    
+    def get(self, window_ind = -1):
+        if window_ind == -1:
+            return self.windows
+        else:
+            return self.windows[window_ind]    
 
 def log(data, client, csvwriter):
   row = []

@@ -7,12 +7,17 @@ from array import array
 from collections import deque
 import OSC, random,curses
 import numpy as np
+import scipy.signal as signal
+
+
 
 #global last
 global length 
 
 length = 10
 temp   = [0] * (length)
+smoothing = [0] * (len(derivative))
+gaussian = signal.gaussian(10,.01,True)
 #last = float(0)
 #window   = collections.deque(maxlen = 9)
 #windows = []
@@ -45,8 +50,7 @@ class SensorWindows(object):
             return self.windows[window_ind]    
 
 def log(data, client, csvwriter):
-  row = []
-  #i = 0; j = 0; 
+  row = [] 
   tempData = 0.;
   row.append(str(time.time()))
   for sensor, setting in gina.iteritems():
@@ -57,15 +61,8 @@ def log(data, client, csvwriter):
         msg.append(tempData)                              if graph else ""
         client.send(msg)                                  if graph else ""
         row.append(tempData)
-    #   makeWindow(tempData, i+j)
-    #     print i+j
-    #     j += 1
-    # j = 0
-    # i += 1
-
-  #pseudocode: makeWindow(transpose(row(1:)))
-  #print row
-  makeWindow(row[4:7], client)
+ 
+  makeWindow(row[2:5], client)
   csvwriter.writerow(row)
 
 def plotOSC(client, address, data):
@@ -77,23 +74,25 @@ def plotOSC(client, address, data):
 
 
 def makeWindow(data, client):
-  #pseudocode for i in windows: windows[i].append(row[i])
-  #averageing kernel: [.2, .2, .2, .2, .2]
-  #derivative kernal
-  #pseudocode  
-  #windows[position].append(tempData)
-  # average = [.2, .2, .2, .2, .2]
-  average = [1/float(length)] * length
+  #average = [1/float(length)] * length
   gyro = np.array(data)
   magnitude = np.sqrt(gyro.dot(gyro))
-  plotOSC(client,'/net/gyro',magnitude)
+  plotOSC(client,'/gyro/net',magnitude)
   temp.append(magnitude)
   temp.pop(0)
-  smooth = np.convolve(temp,average,'valid')
-  plotOSC(client,'/mAvg/gyro',smooth)
+  #smooth = np.convolve(temp,average,'valid')
 
 
-  #window[position][index] = tempData
+  smoothing.append(float(smooth))
+  smoothing.pop(0)
+  deriv(smoothing,client)
+  plotOSC(client,'/gyro/mAvg',smooth)
+
+def deriv(data, client):
+  #data = data[-len(derivative):]
+  jerk = np.convolve(data,derivative,'valid')
+  plotOSC(client,'/gyro/deriv',jerk)
+
 
 
 

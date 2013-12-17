@@ -8,12 +8,15 @@ from collections import deque
 import OSC, random,curses
 import numpy as np
 
-global last
+#global last
 
-length = 20
+length = 5
 temp   = [0] * (length)
-last = float(0)
+#last = float(0)
 #window   = collections.deque(maxlen = 9)
+#windows = []
+#for i in xrange(9): windows.append(deque(maxlen = 9))
+#window = np.zeros(25).reshape((9, 5))
 
 class SensorWindows(object):
     def __init__(self, num_windows=9, window_length=9):
@@ -42,33 +45,53 @@ class SensorWindows(object):
 
 def log(data, client, csvwriter):
   row = []
-  i = 0; j = 0; tempData = 0.;
+  #i = 0; j = 0; 
+  tempData = 0.;
   row.append(str(time.time()))
   for sensor, setting in gina.iteritems():
     for axis, index in setting["data"].iteritems():
-        msg = OSC.OSCMessage()
-        msg.setAddress(setting["name"] + "/" + axis)
+        msg = OSC.OSCMessage()                            if graph else ""
+        msg.setAddress(setting["name"] + "/" + axis)      if graph else ""
         tempData = float(data[index]) / setting["scale"]
-        msg.append(tempData)
-        client.send(msg)
+        msg.append(tempData)                              if graph else ""
+        client.send(msg)                                  if graph else ""
         row.append(tempData)
-        windowsAdd(tempData)
+    #   makeWindow(tempData, i+j)
     #     print i+j
     #     j += 1
     # j = 0
     # i += 1
 
   #pseudocode: makeWindow(transpose(row(1:)))
+  #print row
+  makeWindow(row[4:7], client)
   csvwriter.writerow(row)
 
-def windowsAdd(tempData):
+def plotOSC(client, address, data):
+  if graph:
+    msg = OSC.OSCMessage() 
+    msg.setAddress(str(address))
+    msg.append(data)
+    client.send(msg)
+
+
+def makeWindow(data, client):
   #pseudocode for i in windows: windows[i].append(row[i])
   #averageing kernel: [.2, .2, .2, .2, .2]
   #derivative kernal
-  #pseudocode 
-  windows[position].append(tempData)
+  #pseudocode  
+  #windows[position].append(tempData)
+  average = [.2, .2, .2, .2, .2]
+  gyro = np.array(data)
+  magnitude = np.sqrt(gyro.dot(gyro))
+  temp.append(magnitude)
+  temp.pop(0)
+  smooth = np.convolve(temp,average,'valid')
+  plotOSC(client,'/mAvg/gyro',smooth)
+
 
   #window[position][index] = tempData
+
 
 
 
@@ -94,19 +117,19 @@ def end(m):
 def mAvg(num):
   temp.append(num)
   temp.pop(0)
-  # print "You've made it this far: " + str(temp)
   return sum(temp)/float(length)
 
-def getSlope(num):
-  global last 
-  if (num >= last):
-    last = num
-    return 1;
-  else:
-    last = num;
-    return 0;
+# def getSlope(num):
+#   if (num >= last):
+#     global last 
+#     last = num
+#     return 1;
+#   else:
+#     global last 
+#     last = num;
+#     return 0;
 
-def read(filename, verbose):
+def read(filename, verbose, graph):
   num_good = 0
   num_bad = 0
   num_skip = 0
@@ -128,7 +151,7 @@ def read(filename, verbose):
     n = 0
     oldarr = []
 
-    [client, m] = sniff(header, format, verbose);
+    [client, m] = sniff(header, format, verbose, graph);
 
     while not done:
       try:
@@ -180,14 +203,14 @@ def read(filename, verbose):
 
   #curses.endwin()
 
-def sniff(header, format, verbose):
+def sniff(header, format, verbose, graph):
   m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1431", debug=False)
   startup(m)
 
-  sys.stderr.write( "Starting up OSC...\n") if verbose else ""
-  client = OSC.OSCClient()
-  client.connect( ('127.0.0.1', 8000) ) # note that the argument is a tupple and not two arguments
-  sys.stderr.write( "Sniffing...\n") if verbose else ""
+  sys.stderr.write( "Starting up OSC...\n")         if verbose else ""
+  client = OSC.OSCClient()                          if graph else ""
+  client.connect( ('127.0.0.1', 8000) )             if graph else "" # note that the argument is a tupple and not two arguments
+  sys.stderr.write( "Sniffing...\n")                if verbose else ""
   print "ts " + header
 
 
@@ -200,8 +223,6 @@ def sniff(header, format, verbose):
     pass
 
   return client, m
-if __name__ == "__main__":
-  main(sys.argv[1:])
 
 
 
@@ -210,9 +231,10 @@ def main(argv):
 
   outputfile = ''
   verbose = False
+  global graph 
   graph = False
   try:
-    opts, args = getopt.getopt(argv,"ho:v",["ofile=","verbose=","graph="])
+    opts, args = getopt.getopt(argv,"ho:gv",["ofile=","verbose","graph"])
   except getopt.GetoptError:
     print 'test.py -o <outputfile>'
     sys.exit(2)
@@ -235,4 +257,7 @@ def main(argv):
   path = directory + "1" + "/"
   filename = "data.csv"
 
-  read(path + filename, verbose)
+  read(path + filename, verbose,graph)
+
+if __name__ == "__main__":
+  main(sys.argv[1:])

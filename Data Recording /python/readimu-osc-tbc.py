@@ -16,13 +16,8 @@ global length
 length = 31
 temp   = [0] * (length)
 smoothing = [0] * (len(derivative))
-gaussian = signal.gaussian(length,1,True)
-hamming = signal.hamming(length,True)
-#last = float(0)
-#window   = collections.deque(maxlen = 9)
-#windows = []
-#for i in xrange(9): windows.append(deque(maxlen = 9))
-#window = np.zeros(25).reshape((9, 5))
+gaussian  = signal.gaussian(length,1,True)
+hamming   = signal.hamming(length,True)
 
 class SensorWindows(object):
     def __init__(self, num_windows=9, window_length=9):
@@ -53,7 +48,7 @@ def log(data, client, csvwriter):
   row = [] 
   tempData = 0.;
   orderSensors = []
-  row.append(time.time())
+  row.append(str(time.time()))
   for sensor, setting in gina.iteritems():
     for axis, index in setting["data"].iteritems():
       msg = OSC.OSCMessage()                            if graph else ""
@@ -94,17 +89,11 @@ def makeWindow(data, client):
     else:
       plotOSC(client,'/gyro/peaks',0.0)
 
-
 def deriv(data, client):
   #data = data[-len(derivative):]
   jerk = np.convolve(data,second_derivative,'valid')
   plotOSC(client,'/gyro/deriv',jerk)
   return jerk
-
-
-
-
-
 
 def startup(m):
   m.sendbase(cmd.radio(23))
@@ -128,16 +117,6 @@ def mAvg(num):
   temp.append(num)
   temp.pop(0)
   return sum(temp)/float(length)
-
-# def getSlope(num):
-#   if (num >= last):
-#     global last 
-#     last = num
-#     return 1;
-#   else:
-#     global last 
-#     last = num;
-#     return 0;
 
 def read(filename, verbose, graph):
   num_good = 0
@@ -244,7 +223,7 @@ def main(argv):
   global graph 
   graph = False
   try:
-    opts, args = getopt.getopt(argv,"ho:gv",["ofile=","verbose","graph"])
+    opts, args = getopt.getopt(argv,"ho:gsv",["ofile=","verbose","graph","sound"])
   except getopt.GetoptError:
     print 'test.py -o <outputfile>'
     sys.exit(2)

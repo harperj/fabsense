@@ -11,13 +11,13 @@ import scipy.signal as signal
 
 
 
-#global last
 global length 
 
-length = 9
+length = 31
 temp   = [0] * (length)
 smoothing = [0] * (len(derivative))
 gaussian = signal.gaussian(length,1,True)
+hamming = signal.hamming(length,True)
 #last = float(0)
 #window   = collections.deque(maxlen = 9)
 #windows = []
@@ -55,12 +55,6 @@ def log(data, client, csvwriter):
   orderSensors = []
 
   for sensor, setting in gina.iteritems():
-  #   orderSensors.append(sensor)
-  # orderSensors.sort()
-
-  # row.append(str(time.time()))
-
-  # for sensor in orderSensors:
     for axis, index in setting["data"].iteritems():
       msg = OSC.OSCMessage()                            if graph else ""
       msg.setAddress(setting["name"] + "/" + axis)      if graph else ""
@@ -69,7 +63,7 @@ def log(data, client, csvwriter):
       client.send(msg)                                  if graph else ""
       row.append(tempData)
  
-  makeWindow(row[2:5], client)
+  makeWindow(row[1:4], client)
   csvwriter.writerow(row)
 
 def plotOSC(client, address, data):
@@ -88,16 +82,24 @@ def makeWindow(data, client):
   temp.pop(0)
   #smooth = np.convolve(temp,average,'valid')
 
-  smooth = np.convolve(temp,gaussian,'valid')
+  smooth = np.convolve(temp,hamming,'valid')
   smoothing.append(float(smooth))
   smoothing.pop(0)
-  deriv(smoothing,client)
-  plotOSC(client,'/gyro/mAvg',smooth)
+  jerk = deriv(smoothing,client)
+  plotOSC(client,'/gyro/hamming',smooth)
+
+  if jerk > -0.15 and jerk < 0.15:
+    if magnitude > 0.8:
+      plotOSC(client,'/gyro/peaks',1.0)
+    else:
+      plotOSC(client,'/gyro/peaks',0.0)
+
 
 def deriv(data, client):
   #data = data[-len(derivative):]
-  jerk = np.convolve(data,derivative,'valid')
+  jerk = np.convolve(data,second_derivative,'valid')
   plotOSC(client,'/gyro/deriv',jerk)
+  return jerk
 
 
 

@@ -23,4 +23,4 @@ gina = {"accel": {"name":"/acc", "data":{"x": 6, "y": 7, "z": 8}, "scale": 5000.
 #ginaList = [{"readableName": "accel", "name":"/acc", "data":[("x", 6), "y": 7, "z": 8], "scale": 5000.0}}]
 
 derivative = [1,0,-1]
-
+second_derivative = [1,-2,1]

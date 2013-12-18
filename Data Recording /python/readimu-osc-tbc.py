@@ -8,11 +8,13 @@ from collections import deque
 import OSC, random,curses
 import numpy as np
 import scipy.signal as signal
-
+import pygame
 
 
 global length 
 
+pygame.mixer.init()
+pygame.mixer.music.load('ugh.ogg')
 length = 31
 temp   = [0] * (length)
 smoothing = [0] * (len(derivative))
@@ -91,6 +93,7 @@ def makeWindow(data, client):
   if jerk > -0.15 and jerk < 0.15:
     if magnitude > 0.8:
       plotOSC(client,'/gyro/peaks',1.0)
+      pygame.mixer.music.play()
     else:
       plotOSC(client,'/gyro/peaks',0.0)
 
@@ -214,7 +217,7 @@ def read(filename, verbose, graph):
   #curses.endwin()
 
 def sniff(header, format, verbose, graph):
-  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1431", debug=False)
+  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1421", debug=False)
   startup(m)
 
   sys.stderr.write( "Starting up OSC...\n")         if verbose else ""

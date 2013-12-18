@@ -53,9 +53,8 @@ def log(data, client, csvwriter):
   row = [] 
   tempData = 0.;
   orderSensors = []
-
+  row.append(time.time())
   for sensor, setting in gina.iteritems():
-    row.append(time.time())
     for axis, index in setting["data"].iteritems():
       msg = OSC.OSCMessage()                            if graph else ""
       msg.setAddress(setting["name"] + "/" + axis)      if graph else ""

@@ -12,13 +12,15 @@
   #l? = large scale accelerometer
   #ti = temp for gyro
   #g? = gyro
-
+import collections
   
 directory = "../data/"
 header = "addr len cmd type n sx sy z1 z3 ta lx ly lz ti gx gy gz mx my mz Address"
 format = '! H  b   b   b  H  H  H  H  H  H  H  H  H  H  h  h  h h h h H'
 
 gina = {"accel": {"name":"/acc", "data":{"x": 6, "y": 7, "z": 8}, "scale": 5000.0},"gyro":{"name":"/gyro", "data":{"x": 15, "y": 16, "z": 17}, "scale": 5000.0},"mag":{"name":"/mag", "data":{"x": 18, "y": 19, "z": 20}, "scale" : (360.0+0.5)}}
+
+#ginaList = [{"readableName": "accel", "name":"/acc", "data":[("x", 6), "y": 7, "z": 8], "scale": 5000.0}}]
 
 derivative = [1,0,-1]
 

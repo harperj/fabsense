@@ -14,10 +14,10 @@ import scipy.signal as signal
 #global last
 global length 
 
-length = 10
+length = 9
 temp   = [0] * (length)
 smoothing = [0] * (len(derivative))
-gaussian = signal.gaussian(10,.01,True)
+gaussian = signal.gaussian(length,1,True)
 #last = float(0)
 #window   = collections.deque(maxlen = 9)
 #windows = []
@@ -52,15 +52,22 @@ class SensorWindows(object):
 def log(data, client, csvwriter):
   row = [] 
   tempData = 0.;
-  row.append(str(time.time()))
+  orderSensors = []
+
   for sensor, setting in gina.iteritems():
+  #   orderSensors.append(sensor)
+  # orderSensors.sort()
+
+  # row.append(str(time.time()))
+
+  # for sensor in orderSensors:
     for axis, index in setting["data"].iteritems():
-        msg = OSC.OSCMessage()                            if graph else ""
-        msg.setAddress(setting["name"] + "/" + axis)      if graph else ""
-        tempData = float(data[index]) / setting["scale"]
-        msg.append(tempData)                              if graph else ""
-        client.send(msg)                                  if graph else ""
-        row.append(tempData)
+      msg = OSC.OSCMessage()                            if graph else ""
+      msg.setAddress(setting["name"] + "/" + axis)      if graph else ""
+      tempData = float(data[index]) / setting["scale"]
+      msg.append(tempData)                              if graph else ""
+      client.send(msg)                                  if graph else ""
+      row.append(tempData)
  
   makeWindow(row[2:5], client)
   csvwriter.writerow(row)
@@ -72,7 +79,6 @@ def plotOSC(client, address, data):
     msg.append(data)
     client.send(msg)
 
-
 def makeWindow(data, client):
   #average = [1/float(length)] * length
   gyro = np.array(data)
@@ -82,7 +88,7 @@ def makeWindow(data, client):
   temp.pop(0)
   #smooth = np.convolve(temp,average,'valid')
 
-
+  smooth = np.convolve(temp,gaussian,'valid')
   smoothing.append(float(smooth))
   smoothing.pop(0)
   deriv(smoothing,client)

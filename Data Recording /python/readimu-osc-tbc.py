@@ -55,6 +55,7 @@ def log(data, client, csvwriter):
   orderSensors = []
 
   for sensor, setting in gina.iteritems():
+    row.append(time.time())
     for axis, index in setting["data"].iteritems():
       msg = OSC.OSCMessage()                            if graph else ""
       msg.setAddress(setting["name"] + "/" + axis)      if graph else ""
@@ -88,8 +89,8 @@ def makeWindow(data, client):
   jerk = deriv(smoothing,client)
   plotOSC(client,'/gyro/hamming',smooth)
 
-  if jerk > -0.15 and jerk < 0.15:
-    if magnitude > 0.8:
+  if jerk > -0.05 and jerk < 0.05:
+    if magnitude > 0.85:
       plotOSC(client,'/gyro/peaks',1.0)
     else:
       plotOSC(client,'/gyro/peaks',0.0)
@@ -147,7 +148,7 @@ def read(filename, verbose, graph):
   print filename
 
   with open(filename, 'w') as csvfile:
-    csvwriter = csv.writer(csvfile, delimiter= " ")
+    csvwriter = csv.writer(csvfile, delimiter= ",")
     csvwriter.writerow(["timestamp", "accX", "accY", "accZ", "gyrX", "gyrY", "gyrZ", "magX", "magY", "magZ"])
 
 
@@ -265,7 +266,7 @@ def main(argv):
 
   #TODO (Look in data, count # folders, +1, mkdir +1, )
   path = directory + "1" + "/"
-  filename = "data.csv"
+  filename = "false.csv"
 
   read(path + filename, verbose,graph)
 

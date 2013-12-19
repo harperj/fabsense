@@ -20,7 +20,7 @@ format = '! H  b   b   b  H  H  H  H  H  H  H  H  H  H  h  h  h h h h H'
 
 gina = {"accel": {"name":"/acc", "data":{"x": 6, "y": 7, "z": 8}, "scale": 5000.0},"gyro":{"name":"/gyro", "data":{"x": 15, "y": 16, "z": 17}, "scale": 5000.0},"mag":{"name":"/mag", "data":{"x": 18, "y": 19, "z": 20}, "scale" : (360.0+0.5)}}
 
-soundNames = ['anotherplease','ilikeit','ithurts','ouch1','ouch2','pleasestop','shorttouch','stop','stopit','ugh']
+soundNames = ['anotherplease','ilikeit','ithurts','ouch1','ouch2','pleasestop','shortouch','stop','stopit','ugh']
 
 #ginaList = [{"readableName": "accel", "name":"/acc", "data":[("x", 6), "y": 7, "z": 8], "scale": 5000.0}}]
 

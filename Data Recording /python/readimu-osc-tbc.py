@@ -59,6 +59,7 @@ def log(data, client, csvwriter):
       msg.append(tempData)                              if graph else ""
       client.send(msg)                                  if graph else ""
       row.append(tempData)
+      #print "(", sensor, ",", setting, ")"
  
   makeWindow(row[1:4], client)
   csvwriter.writerow(row)
@@ -70,9 +71,13 @@ def plotOSC(client, address, data):
     msg.append(data)
     client.send(msg)
 
+global jerk_pos 
+jerk_pos = True
+
 def makeWindow(data, client):
-  #average = [1/float(length)] * length
-  gyro = np.array(data)
+  global jerk_pos
+#average = [1/float(length)] * length
+  gyro = np.array(data[1])
   magnitude = np.sqrt(gyro.dot(gyro))
   plotOSC(client,'/gyro/net',magnitude)
   temp.append(magnitude)
@@ -84,6 +89,17 @@ def makeWindow(data, client):
   smoothing.pop(0)
   jerk = deriv(smoothing,client)
   plotOSC(client,'/gyro/hamming',smooth)
+
+  if jerk_pos:
+      if jerk < 0.1:
+          jerk_pos = False
+          print "jerk change to neg ", jerk
+          if magnitude > 0.2:
+              print "HAMMERTIME"
+  else:
+      if jerk > 0.1:
+          jerk_pos = True
+          print "jerk change to pos ", jerk
 
   if jerk > -0.05 and jerk < 0.05:
     if magnitude > 0.85:

@@ -106,20 +106,20 @@ def makeWindow(data, client):
   plotOSC(client,'/gyro/hamming',smooth)
 
   if jerk_pos:
-      if jerk < 0.1:
+      if jerk < -0.08:
           jerk_pos = False
           print "jerk change to neg ", jerk
-          if magnitude > 0.2:
+          if magnitude > 0.13:
               print "HAMMERTIME"
+              playSound()
   else:
-      if jerk > 0.1:
+      if jerk > 0.12:
           jerk_pos = True
           print "jerk change to pos ", jerk
 
   if jerk > -0.05 and jerk < 0.05:
     if magnitude > 0.85:
       plotOSC(client,'/gyro/peaks',1.0)
-      playSound()
     else:
       plotOSC(client,'/gyro/peaks',0.0)
 

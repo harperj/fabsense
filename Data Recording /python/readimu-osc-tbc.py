@@ -11,15 +11,15 @@ import scipy.signal as signal
 import pygame
 
 
-global length 
+global length
+global jerk_pos  
 
-#pygame.mixer.init()
-#pygame.mixer.music.load('ugh.ogg')
 length = 31
 temp   = [0] * (length)
 smoothing = [0] * (len(derivative))
 gaussian  = signal.gaussian(length,1,True)
 hamming   = signal.hamming(length,True)
+jerk_pos = True
 
 class SensorWindows(object):
     def __init__(self, num_windows=9, window_length=9):
@@ -46,20 +46,11 @@ class SensorWindows(object):
         else:
             return self.windows[window_ind]    
 
-# def loadSound():
-#   sounds = []
-#   pygame.mixer.init()
-#   for i in len(soundNames)
-#     sounds.append('/sounds/'+ pygame.mixer.music.load(soundNames[i] + '.ogg'))
-
-
 def playSound():
-  rand = random.randint(0,len(soundNames)-1)
-  pygame.mixer.music.load('sounds/' + soundNames[rand] + '.ogg')
-  pygame.mixer.music.play()
-
-
-
+  if sound:
+    rand = random.randint(0,len(soundNames)-1)
+    pygame.mixer.music.load('sounds/' + soundNames[rand] + '.ogg')
+    pygame.mixer.music.play()
 
 def log(data, client, csvwriter):
   row = [] 
@@ -76,7 +67,7 @@ def log(data, client, csvwriter):
       row.append(tempData)
       #print "(", sensor, ",", setting, ")"
  
-  makeWindow(row[1:4], client)
+  makeWindow(row[1:4], client, dorkbotHammer)
   csvwriter.writerow(row)
 
 def plotOSC(client, address, data):
@@ -86,18 +77,36 @@ def plotOSC(client, address, data):
     msg.append(data)
     client.send(msg)
 
-global jerk_pos 
-jerk_pos = True
 
-def makeWindow(data, client):
+def dorkbotHammer(jerk, magnitude):
   global jerk_pos
-#average = [1/float(length)] * length
+  if jerk_pos:
+      if jerk < -0.07:
+          jerk_pos = False
+          print "jerk change to neg ", jerk
+          print magnitude
+          if magnitude > 0.15:
+              print "HAMMERTIME "
+              playSound()
+  else:
+      if jerk > 0.07:
+          jerk_pos = True
+          print "jerk change to pos ", jerk
+
+def looseAcceptHammer(jerk, magnitude):
+  if jerk > -0.05 and jerk < 0.05:
+    if magnitude > 0.85:
+      plotOSC(client,'/gyro/peaks',1.0)
+      #playSound()
+    else:
+      plotOSC(client,'/gyro/peaks',0.0)
+
+def makeWindow(data, client, hammerFunc):
   gyro = np.array(data[1])
   magnitude = np.sqrt(gyro.dot(gyro))
   plotOSC(client,'/gyro/net',magnitude)
   temp.append(magnitude)
   temp.pop(0)
-  #smooth = np.convolve(temp,average,'valid')
 
   smooth = np.convolve(temp,hamming,'valid')
   smoothing.append(float(smooth))
@@ -105,23 +114,7 @@ def makeWindow(data, client):
   jerk = deriv(smoothing,client)
   plotOSC(client,'/gyro/hamming',smooth)
 
-  if jerk_pos:
-      if jerk < -0.08:
-          jerk_pos = False
-          print "jerk change to neg ", jerk
-          if magnitude > 0.13:
-              print "HAMMERTIME"
-              playSound()
-  else:
-      if jerk > 0.12:
-          jerk_pos = True
-          print "jerk change to pos ", jerk
-
-  if jerk > -0.05 and jerk < 0.05:
-    if magnitude > 0.85:
-      plotOSC(client,'/gyro/peaks',1.0)
-    else:
-      plotOSC(client,'/gyro/peaks',0.0)
+  hammerFunc(jerk, magnitude)
 
 def deriv(data, client):
   #data = data[-len(derivative):]
@@ -229,7 +222,7 @@ def read(filename, verbose, graph):
   #curses.endwin()
 
 def sniff(header, format, verbose, graph):
-  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1421", debug=False)
+  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1431", debug=False)
   startup(m)
 
   sys.stderr.write( "Starting up OSC...\n")         if verbose else ""

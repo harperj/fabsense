@@ -1,6 +1,6 @@
 #/usr/bin/python
 from config import *
-import time, sys, getopt, csv
+import time, sys, getopt, csv, pygame, random
 import lib.motetalk as motetalk
 from lib.motetalk import cmd, packetify, setpwm
 from array import array
@@ -43,6 +43,21 @@ class SensorWindows(object):
             return self.windows
         else:
             return self.windows[window_ind]    
+
+# def loadSound():
+#   sounds = []
+#   pygame.mixer.init()
+#   for i in len(soundNames)
+#     sounds.append('/sounds/'+ pygame.mixer.music.load(soundNames[i] + '.ogg'))
+
+
+def playSound():
+  rand = random.randint(0,len(sound)-1)
+  pygame.mixer.music.load('sounds/' + soundNames[rand] + '.ogg'))
+  pygame.mixer.music.play()
+
+
+
 
 def log(data, client, csvwriter):
   row = [] 
@@ -142,6 +157,8 @@ def read(filename, verbose, graph):
 
     [client, m] = sniff(header, format, verbose, graph);
 
+    []
+
     while not done:
       try:
         (arr, t, crc) = m.nextline()
@@ -222,6 +239,9 @@ def main(argv):
   verbose = False
   global graph 
   graph = False
+  global sound
+  sound = false
+
   try:
     opts, args = getopt.getopt(argv,"ho:gsv",["ofile=","verbose","graph","sound"])
   except getopt.GetoptError:
@@ -237,6 +257,8 @@ def main(argv):
       verbose  = True
     elif opt in ("-g","--graph"):
       graph = True
+    elif opt in ("-s","--sound"):
+      sound = True
 
   print 'Output file is "', outputfile
   if verbose :
@@ -245,6 +267,8 @@ def main(argv):
   #TODO (Look in data, count # folders, +1, mkdir +1, )
   path = directory + "1" + "/"
   filename = "false.csv"
+
+  pygame.mixer.init()
 
   read(path + filename, verbose,graph)
 

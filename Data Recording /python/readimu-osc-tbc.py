@@ -13,8 +13,8 @@ import pygame
 
 global length 
 
-pygame.mixer.init()
-pygame.mixer.music.load('ugh.ogg')
+#pygame.mixer.init()
+#pygame.mixer.music.load('ugh.ogg')
 length = 31
 temp   = [0] * (length)
 smoothing = [0] * (len(derivative))
@@ -54,8 +54,8 @@ class SensorWindows(object):
 
 
 def playSound():
-  rand = random.randint(0,len(sound)-1)
-  pygame.mixer.music.load('sounds/' + soundNames[rand] + '.ogg'))
+  rand = random.randint(0,len(soundNames)-1)
+  pygame.mixer.music.load('sounds/' + soundNames[rand] + '.ogg')
   pygame.mixer.music.play()
 
 
@@ -119,7 +119,7 @@ def makeWindow(data, client):
   if jerk > -0.05 and jerk < 0.05:
     if magnitude > 0.85:
       plotOSC(client,'/gyro/peaks',1.0)
-      pygame.mixer.music.play()
+      playSound()
     else:
       plotOSC(client,'/gyro/peaks',0.0)
 
@@ -259,7 +259,7 @@ def main(argv):
   global graph 
   graph = False
   global sound
-  sound = false
+  sound = False
 
   try:
     opts, args = getopt.getopt(argv,"ho:gsv",["ofile=","verbose","graph","sound"])

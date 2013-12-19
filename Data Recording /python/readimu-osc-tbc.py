@@ -67,7 +67,7 @@ def log(data, client, csvwriter):
       row.append(tempData)
       #print "(", sensor, ",", setting, ")"
  
-  makeWindow(row[1:4], client, dorkbotHammer)
+  makeWindow(row[1:7], client, dorkbotHammer)
   csvwriter.writerow(row)
 
 def plotOSC(client, address, data):
@@ -78,18 +78,30 @@ def plotOSC(client, address, data):
     client.send(msg)
 
 
-def dorkbotHammer(jerk, magnitude):
+def dorkbotHammer(data, client):
+  magnitude = np.sqrt(np.array(data).dot(np.array(data)))
   global jerk_pos
+  
+  temp.append(data[4])
+  temp.pop(0)
+
+  smooth = np.convolve(temp,hamming,'valid')
+  smoothing.append(float(smooth))
+  smoothing.pop(0)
+  plotOSC(client,'/gyro/hamming',smooth)
+  jerk = deriv(smoothing,client)
+  
   if jerk_pos:
-      if jerk < -0.07:
+      if jerk < -0.025:
           jerk_pos = False
           print "jerk change to neg ", jerk
-          print magnitude
-          if magnitude > 0.15:
+          #print magnitude
+          print data[4]
+          if data[4] > 0.4 and data[1] > 0.005:
               print "HAMMERTIME "
               playSound()
   else:
-      if jerk > 0.07:
+      if jerk > 0.025:
           jerk_pos = True
           print "jerk change to pos ", jerk
 
@@ -105,16 +117,9 @@ def makeWindow(data, client, hammerFunc):
   gyro = np.array(data[1])
   magnitude = np.sqrt(gyro.dot(gyro))
   plotOSC(client,'/gyro/net',magnitude)
-  temp.append(magnitude)
-  temp.pop(0)
 
-  smooth = np.convolve(temp,hamming,'valid')
-  smoothing.append(float(smooth))
-  smoothing.pop(0)
-  jerk = deriv(smoothing,client)
-  plotOSC(client,'/gyro/hamming',smooth)
 
-  hammerFunc(jerk, magnitude)
+  hammerFunc(data, client)
 
 def deriv(data, client):
   #data = data[-len(derivative):]
@@ -222,7 +227,7 @@ def read(filename, verbose, graph):
   #curses.endwin()
 
 def sniff(header, format, verbose, graph):
-  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1431", debug=False)
+  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1421", debug=False)
   startup(m)
 
   sys.stderr.write( "Starting up OSC...\n")         if verbose else ""

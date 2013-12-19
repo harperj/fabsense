@@ -97,7 +97,8 @@ def dorkbotHammer(data, client):
           print "jerk change to neg ", jerk
           #print magnitude
           print data[4]
-          if data[4] > 0.4 and data[1] > 0.005:
+          print data[1]
+          if data[4] > 0.4:
               print "HAMMERTIME "
               playSound()
   else:
@@ -227,7 +228,7 @@ def read(filename, verbose, graph):
   #curses.endwin()
 
 def sniff(header, format, verbose, graph):
-  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1421", debug=False)
+  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1431", debug=False)
   startup(m)
 
   sys.stderr.write( "Starting up OSC...\n")         if verbose else ""

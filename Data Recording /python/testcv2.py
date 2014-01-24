@@ -1,7 +1,7 @@
 import cv2 
 import time, sys
 
-testnum = 10;
+testnum = 15;
 
 print "Filename testVideo-timestamp-" + str(testnum) + ".txt"
 f = open("testVideo-timestamp-" + str(testnum) + ".txt", "w")

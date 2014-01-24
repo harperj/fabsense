@@ -128,6 +128,17 @@ xlabel('Frequency (Hz)')
 
 
 
+%% working with Manas 1/17/2014
 
+windows = 1000;
+
+magEx = rms(:,3);
+Y = fft(magEx,windows);
+
+Pyy = Y.*conj(Y)/windows;
+f = 150/windows*(0:127);
+plot(f,Pyy(1:128))
+title('Power spectral density')
+xlabel('Frequency (Hz)')
 
  

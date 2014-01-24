@@ -1,6 +1,6 @@
 #/usr/bin/python
 from config import *
-import time, sys, getopt, csv, pygame, random
+import time, sys, getopt, csv, random
 import lib.motetalk as motetalk
 from lib.motetalk import cmd, packetify, setpwm
 from array import array
@@ -8,49 +8,7 @@ from collections import deque
 import OSC, random,curses
 import numpy as np
 import scipy.signal as signal
-import pygame
 
-
-global length
-global jerk_pos  
-
-length = 31
-temp   = [0] * (length)
-smoothing = [0] * (len(derivative))
-gaussian  = signal.gaussian(length,1,True)
-hamming   = signal.hamming(length,True)
-jerk_pos = True
-
-class SensorWindows(object):
-    def __init__(self, num_windows=9, window_length=9):
-        self.length = window_length
-        self.windows = []
-        for i in xrange(num_windows):
-            self.windows.append(np.zeros(window_length, dtype='f'))
-        
-        self.num_windows = num_windows
-        self.index = 0
-        
-    def addValues(self, vals):
-        if len(vals) != self.num_windows:
-            print "ERROR: Number of values not equal to number of windows."
-            return
-        else:
-            for i in xrange(self.num_windows):
-                self.windows[i][self.index] = vals[i]
-            self.index = (self.index + 1) % self.length
-    
-    def get(self, window_ind = -1):
-        if window_ind == -1:
-            return self.windows
-        else:
-            return self.windows[window_ind]    
-
-def playSound():
-  if sound:
-    rand = random.randint(0,len(soundNames)-1)
-    pygame.mixer.music.load('sounds/' + soundNames[rand] + '.ogg')
-    pygame.mixer.music.play()
 
 def log(data, client, csvwriter):
   row = [] 
@@ -67,7 +25,6 @@ def log(data, client, csvwriter):
       row.append(tempData)
       #print "(", sensor, ",", setting, ")"
  
-  makeWindow(row[1:7], client, dorkbotHammer)
   csvwriter.writerow(row)
 
 def plotOSC(client, address, data):
@@ -76,57 +33,6 @@ def plotOSC(client, address, data):
     msg.setAddress(str(address))
     msg.append(data)
     client.send(msg)
-
-
-def dorkbotHammer(data, client):
-  magnitude = np.sqrt(np.array(data).dot(np.array(data)))
-  global jerk_pos
-  
-  temp.append(data[4])
-  temp.pop(0)
-
-  smooth = np.convolve(temp,hamming,'valid')
-  smoothing.append(float(smooth))
-  smoothing.pop(0)
-  plotOSC(client,'/gyro/hamming',smooth)
-  jerk = deriv(smoothing,client)
-  
-  if jerk_pos:
-      if jerk < -0.025:
-          jerk_pos = False
-          print "jerk change to neg ", jerk
-          #print magnitude
-          print data[4]
-          print data[1]
-          if data[4] > 0.4:
-              print "HAMMERTIME "
-              playSound()
-  else:
-      if jerk > 0.025:
-          jerk_pos = True
-          print "jerk change to pos ", jerk
-
-def looseAcceptHammer(jerk, magnitude):
-  if jerk > -0.05 and jerk < 0.05:
-    if magnitude > 0.85:
-      plotOSC(client,'/gyro/peaks',1.0)
-      #playSound()
-    else:
-      plotOSC(client,'/gyro/peaks',0.0)
-
-def makeWindow(data, client, hammerFunc):
-  gyro = np.array(data[1])
-  magnitude = np.sqrt(gyro.dot(gyro))
-  plotOSC(client,'/gyro/net',magnitude)
-
-
-  hammerFunc(data, client)
-
-def deriv(data, client):
-  #data = data[-len(derivative):]
-  jerk = np.convolve(data,second_derivative,'valid')
-  plotOSC(client,'/gyro/deriv',jerk)
-  return jerk
 
 def startup(m):
   m.sendbase(cmd.radio(23))
@@ -145,11 +51,6 @@ def startup(m):
 def end(m):
   m.sendbase(cmd.mode(cmd.mode_spin))
   m.end()
-
-def mAvg(num):
-  temp.append(num)
-  temp.pop(0)
-  return sum(temp)/float(length)
 
 def read(filename, verbose, graph):
   num_good = 0
@@ -257,11 +158,9 @@ def main(argv):
   verbose = False
   global graph 
   graph = False
-  global sound
-  sound = False
 
   try:
-    opts, args = getopt.getopt(argv,"ho:gsv",["ofile=","verbose","graph","sound"])
+    opts, args = getopt.getopt(argv,"ho:gv",["ofile=","verbose","graph"])
   except getopt.GetoptError:
     print 'test.py -o <outputfile>'
     sys.exit(2)
@@ -275,8 +174,6 @@ def main(argv):
       verbose  = True
     elif opt in ("-g","--graph"):
       graph = True
-    elif opt in ("-s","--sound"):
-      sound = True
 
   print 'Output file is "', outputfile
   if verbose :
@@ -285,8 +182,6 @@ def main(argv):
   #TODO (Look in data, count # folders, +1, mkdir +1, )
   path = directory + "1" + "/"
   filename = "false.csv"
-
-  pygame.mixer.init()
 
   read(path + filename, verbose,graph)
 

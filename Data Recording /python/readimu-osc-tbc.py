@@ -181,7 +181,7 @@ def main(argv):
 
   #TODO (Look in data, count # folders, +1, mkdir +1, )
   path = directory + "1" + "/"
-  filename = "false.csv"
+  filename = str(outputfile)
 
   read(path + filename, verbose,graph)
 

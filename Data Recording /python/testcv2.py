@@ -1,23 +1,21 @@
 import cv2 
 import time, sys
 
-testnum = 15;
-
-print "Filename testVideo-timestamp-" + str(testnum) + ".txt"
-f = open("testVideo-timestamp-" + str(testnum) + ".txt", "w")
+f = open("outputime.txt", "w")
 
 
 camera = cv2.VideoCapture(0)
-fps = 9
+fps = 20
 capSize = (1028,720)
-fourcc = cv2.cv.CV_FOURCC('T','H','E','O') # note the lower case
+fourcc = cv2.cv.CV_FOURCC(*'MJPG') # note the lower case
 _, img = camera.read()
 height, width, layers = img.shape
 
-video = cv2.VideoWriter('output-' + str(testnum) + '.ogv', fourcc, fps, (width, height))
+video = cv2.VideoWriter('output.mov', -1, fps, (width,height))
 
-while True:
+while True:	
    _, img = camera.read()
+   cv2.imshow('frame',img)
    video.write(img)
    f.write(str(time.time()) + "\n")
 

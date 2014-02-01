@@ -1,10 +1,7 @@
 import cv2 
 import time, sys
 
-testnum = 15;
-
-print "Filename testVideo-timestamp-" + str(testnum) + ".txt"
-f = open("testVideo-timestamp-" + str(testnum) + ".txt", "w")
+f = open("outputime.txt", "w")
 
 
 camera = cv2.VideoCapture(0)
@@ -19,8 +16,9 @@ height, width, layers = img.shape
 
 video = cv2.VideoWriter('output-' + str(testnum) + '.avi', fourcc, fps, (width, height), 1)
 
-while True:
+while True:	
    _, img = camera.read()
+   cv2.imshow('frame',img)
    video.write(img)
    f.write(str(time.time()) + "\n")
 

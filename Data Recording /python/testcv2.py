@@ -8,13 +8,16 @@ f = open("testVideo-timestamp-" + str(testnum) + ".txt", "w")
 
 
 camera = cv2.VideoCapture(0)
-fps = 9
-capSize = (1028,720)
-fourcc = cv2.cv.CV_FOURCC('T','H','E','O') # note the lower case
+
+fps = 15
+camera.set(cv2.cv.CV_CAP_PROP_FPS, 15)
+capSize = (1028,768)
+
+fourcc = cv2.cv.CV_FOURCC('X','V','I','D')  # note the lower case
 _, img = camera.read()
 height, width, layers = img.shape
 
-video = cv2.VideoWriter('output-' + str(testnum) + '.ogv', fourcc, fps, (width, height))
+video = cv2.VideoWriter('output-' + str(testnum) + '.avi', fourcc, fps, (width, height), 1)
 
 while True:
    _, img = camera.read()
@@ -22,7 +25,7 @@ while True:
    f.write(str(time.time()) + "\n")
 
    #cv2.imshow("webcam",img)
-   if (cv2.waitKey(10) != -1):
+   if (cv2.waitKey(1) != -1):
        break
 
 f.close()

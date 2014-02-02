@@ -18,7 +18,6 @@ video = cv2.VideoWriter('output-' + str(testnum) + '.avi', fourcc, fps, (width, 
 
 while True:	
    _, img = camera.read()
-   cv2.imshow('frame',img)
    video.write(img)
    f.write(str(time.time()) + "\n")
 

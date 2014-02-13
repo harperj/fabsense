@@ -144,6 +144,20 @@ hammEx = ...
      1343,1357,1370,1383,1386;
      1386,1394,1407,1419,1425;
      1425,1444,1456,1469,1474;]
+ 
+ %% from main.m
+ %scales the data vectors to between 1 and 0
+
+
+for i = 1:numel(s)
+    for j = 1:numel(ax)
+        tmp = d.(s{i}).(ax{j});
+        tmp = (tmp - min(tmp))./ range(tmp);
+        d.(s{i}).(ax{j}) = tmp;
+    end
+end
+
+clear tmp i j
     
 
 

@@ -38,11 +38,11 @@ function loadD3() {
 		readAnnotationsFromText();
 	});
 
-  d3.text("bike_rack_replace/bike_rack_replace-times.txt", function(error, text) {
+  d3.text("drill_test2/drill_test2-times.txt", function(error, text) {
     video_begin = parseFloat(text.split("\n",1)[0]);
   });
   
-  d3.csv("bike_rack_replace/bike_rack_replace-sampled.csv", function(error, data) {
+  d3.csv("drill_test2/drill_test2-data.csv", function(error, data) {
     sensor_begin = parseFloat(data[0]['timestamp']);
     buildTimeSeries(data, "acc", function(key) {return (key.charAt(0) == 'a');});
     buildTimeSeries(data, "gyr", function(key) {return (key.charAt(0) == 'g');});

@@ -1,2 +1,0 @@
-Header: hammer nail many 1 
-timestamp, accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ

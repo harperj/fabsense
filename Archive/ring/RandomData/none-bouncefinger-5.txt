@@ -1,2 +1,0 @@
-Header: timestamp, accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ
-1378933014.19, /acc/x [0.37619999051094055], 

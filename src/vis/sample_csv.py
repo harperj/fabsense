@@ -7,11 +7,11 @@ def sample_csv(filename, outfilename):
             
             counter = 0
             for line in datafile:
-                if counter % 15 == 0:
+                if counter % 15 == 0: #change the numerical value for 1/n sampling
                     outfile.write(line)
                 counter = counter + 1
             
             
             
 if __name__ == '__main__':
-    sample_csv('bike_rack_replace/bike_rack_replace.csv', 'bike_rack_replace/bike_rack_replace-sampled.csv')
+    sample_csv('data/7-hammer/7-data.csv', 'data/7-hammer/7-sampled.csv')

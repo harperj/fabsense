@@ -23,8 +23,8 @@ To Do:
 clear all; close all;
 
 %% import data and reformat
-foldername = '../../../data/6-hammer/';
-trialnum = num2str(6);
+foldername = '../../../data/5-driver/';
+trialnum = num2str(5);
 filename = [foldername  trialnum '-data.csv'];
 M = importdata(filename,',',1);
 
@@ -157,18 +157,23 @@ end
 clear a f s i j times len
 
 %% build rms features
-d.features = [d.features, zeros(buckets,9)];
+%d.features = [d.features, zeros(buckets,9)];
 n = 1;
 
 for i = 1:buckets
     for j = 1:numel(sen)
         for k = 1:3
-           d.features(i,n) = rms(d.windows{i}.(sen{j})(k,:));
+           d.features(i,n) =...
+               rms(abs(d.windows{i}.(sen{j})(k,:)));
            n = n+1;
         end
     end
     n = 1;
 end
+
+d.featurenames = {'rms-acc-x','rms-acc-y','rms-acc-z'...
+    ,'rms-gyr-x','rms-gyr-y','rms-gyr-z'...
+    ,'rms-mag-x','rms-mag-y','rms-mag-z'};
 
 clear n i j k 
 
@@ -195,3 +200,16 @@ for i = 1:numel(sen)
 end
 
 clear i j k tmp ax
+
+%% save the whole workspace in the directory
+filename = [foldername  trialnum '-formatted.mat'];
+save(filename,'d')
+
+%% save the training set
+trainfolder = '../../../data/train-classifier/';
+filename = [trainfolder trialnum '-train.mat'];
+training = struct();
+training.features = d.features;
+training.labels = d.labels;
+training.featurenames = d.featurenames;
+save(filename,'training');

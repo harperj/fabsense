@@ -17,6 +17,6 @@ for i = 1:length(loadnums)
     train.features = [train.features; training.features];
 end
 
-t = train;
 
-clear training i train
+
+clear training i unique 

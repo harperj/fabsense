@@ -9,15 +9,17 @@ Decription: this script is intended to contain the primary structure and
 Pipeline:
     import data and create a data structure
     perform basic signal processing (RMS, peaks, etc.)
+    add the results to the bins
 
 To Do:
     clean up 
-    perform basic signal processing (RMS, peaks, etc.)
-    import and view canonical examples
-    perform dtw
-    add the results to the bins
-    machine learning
+    
+    
+   
 
+Done:
+    perform dtw - removed
+    machine learning - takes place elsewhere
 %}
 %% 
 clear all; close all;
@@ -157,26 +159,33 @@ end
 clear a f s i j times len
 
 %% build rms features
-%d.features = [d.features, zeros(buckets,9)];
+%{
+for each signal and axis in each window, we compute the rms and add it to
+the feature matrix. Window size is consistent but count of samples varies.
+This produces 9 features.
+%}
 n = 1;
 
+%loop through each window, then each sensor, then each axis
 for i = 1:buckets
     for j = 1:numel(sen)
         for k = 1:3
+           % adds the rms signal of the samples in the window
            d.features(i,n) =...
                rms(abs(d.windows{i}.(sen{j})(k,:)));
+           % this tracks the feature to edit, see featurenames for list
            n = n+1;
         end
     end
     n = 1;
 end
 
+%this is a cludgy way to add the feature names but it gets the job done
 d.featurenames = {'rms-acc-x','rms-acc-y','rms-acc-z'...
     ,'rms-gyr-x','rms-gyr-y','rms-gyr-z'...
     ,'rms-mag-x','rms-mag-y','rms-mag-z'};
 
 clear n i j k 
-
 %% build the rms signal 
 %{
 for each signal acc, gyr, and mag, we take the x,y, and z values at each

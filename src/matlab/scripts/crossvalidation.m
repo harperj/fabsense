@@ -50,7 +50,6 @@ clear diff I noise TF M N unique classes
 
 %% randomize the data
 train = randomizedata(train);
-length(train.features)
 
 %% cross validation algorithm  
 folds = 10;
@@ -89,7 +88,9 @@ for j = 1:folds
         struct('matrix', C, 'order', order);
 end
 
-foldacc()
+disp(foldacc());
+
+clear C i j label order temp 
 
 %% Question 2: plot confusion matrix
 % need to fix the number of subplots

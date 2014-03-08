@@ -7,7 +7,7 @@ def sample_csv(filename, outfilename):
             
             counter = 0
             for line in datafile:
-                if counter % 15 == 0: #change the numerical value for 1/n sampling
+                if counter % 5 == 0: #change the numerical value for 1/n sampling
                     outfile.write(line)
                 counter = counter + 1
             

@@ -40,11 +40,11 @@ function loadD3() {
 
 	// MODIFY BELOW CODE TO CHANGE TO NEW DATASET
 
-  d3.text("6-times.txt", function(error, text) {
+  d3.text("19-times.txt", function(error, text) {
     video_begin = parseFloat(text.split("\n",1)[0]);
   });
 
-  d3.csv("6-sampled.csv", function(error, data) {
+  d3.csv("19-sampled.csv", function(error, data) {
     sensor_begin = parseFloat(data[0]['timestamp']);
     buildTimeSeries(data, "acc", function(key) {return (key.charAt(0) == 'a');});
     buildTimeSeries(data, "gyr", function(key) {return (key.charAt(0) == 'g');});

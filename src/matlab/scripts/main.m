@@ -13,9 +13,6 @@ Pipeline:
 
 To Do:
     clean up 
-    
-    
-   
 
 Done:
     perform dtw - removed
@@ -25,8 +22,8 @@ Done:
 clear all; close all;
 
 %% import data and reformat
-foldername = '../../../data/5-driver/';
-trialnum = num2str(5);
+foldername = '../../../data/19-hammer/';
+trialnum = num2str(19);
 filename = [foldername  trialnum '-data.csv'];
 M = importdata(filename,',',1);
 
@@ -129,7 +126,7 @@ if(exist(filename,'file'))
     d.ann.times  = a.data ./ 1000;
     d.ann.labels = a.textdata;
 
-    for i = 1:length(d.ann.times);
+    for i = 1:size(d.ann.times,1);
         start  = d.ann.times(i,1);
         finish = d.ann.times(i,2);
         sindex = find(d.time >= start,1,'first');

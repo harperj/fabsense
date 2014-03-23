@@ -5,4 +5,5 @@ Basic order:
 2. main.m saves training data into data/train-classifier
 3. run loadtraining.m you have to choose the training data to include with "loadnums"
 4. run crossvalidation.m you have to make sure the numerical coding has enough numbers for each tool being classified
-5. 2/27/2014 I'm working on a confusion matrix right now!
+
+

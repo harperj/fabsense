@@ -1,9 +1,11 @@
 %% load all training data 
 % cd ../Research/fabsense/src/matlab/scripts/
 clear all; close all;
+addpath functions
 
 %files to load:
-loadnums = [5,6,7];
+loadnums = [14,15,16,17,18,19];
+%loadnums = [5,6,7,8,9,10,11,14,15,16,17,18,19];
 trainfolder = '../../../data/train-classifier/';
 
 %prep structures:

@@ -96,7 +96,7 @@ clear C i j label order temp
 % need to fix the number of subplots
 colormap(flipud(gray))
 for i = 1:folds;
-    subplot(3,3,i)
+    subplot(4,4,i)
     imagesc(predicted{i}.confusion.matrix)
     
     %format axis
@@ -112,7 +112,7 @@ for i = 1:folds;
 
 end
 
-subplot(3,3,folds+1)
+subplot(4,4,folds+1)
 colorbar()
 set(gcf, 'color', 'w');
     

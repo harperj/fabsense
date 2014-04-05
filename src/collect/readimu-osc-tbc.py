@@ -129,7 +129,7 @@ def read(filename, verbose, graph):
   #curses.endwin()
 
 def sniff(header, format, verbose, graph):
-  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1421", debug=False)
+  m = motetalk.motetalk(format, header, "/dev/tty.usbmodem1431", debug=False)
   startup(m)
 
   sys.stderr.write( "Starting up OSC...\n")         if verbose else ""

@@ -24,5 +24,6 @@ test.labels    = [d.labels];
 test.features  = [d.features];
 test.timestamp = [d.bins];
 test.annotations = [d.annotations];
+test.time      = [d.time];
 
 end

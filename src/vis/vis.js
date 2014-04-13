@@ -1,3 +1,5 @@
+var input =[];
+var input2 =[];
 var margin = {top: 20, right: 80, bottom: 20, left: 51},
     width = 960 - margin.left - margin.right,
     height = 200 - margin.top - margin.bottom;
@@ -26,7 +28,7 @@ var video;
 var sensor_begin;
 var video_begin;
 
-function loadD3() {
+function loadD3(metadata) {
 
   $("#annotateButton").on("click", function(event) {
     annotBrush();
@@ -39,23 +41,41 @@ function loadD3() {
 	});
 
 	// MODIFY BELOW CODE TO CHANGE TO NEW DATASET
-
-  d3.text("data/51-mixedscrew/51-times.txt", function(error, text) {
+  var path = "data/"+ metadata.trial + "-" + metadata.folder +"/"+ metadata.trial + "-";
+  d3.text(path + "times.txt", function(error, text) {
     video_begin = parseFloat(text.split("\n",1)[0]);
   });
 
-  d3.csv("data/51-mixedscrew/51-sampled.csv", function(error, data) {
+  d3.csv(path + "sampled.csv", function(error, data) {
     sensor_begin = parseFloat(data[0]['timestamp']);
     buildTimeSeries(data, "acc", function(key) {return (key.charAt(0) == 'a');});
     buildTimeSeries(data, "gyr", function(key) {return (key.charAt(0) == 'g');});
     buildTimeSeries(data, "mag", function(key) {return (key.charAt(0) == 'm');});
   });
-	
+
+  d3.csv(path + "classified.csv", function(error, data){
+  
+  input = $.map(data, function(el, i){
+      var start = parseInt(el.start) / 1000;
+      var end = parseInt(el.finish) / 1000;
+      return  start + "," + end;
+   });
+   console.log(input);
+  });
+	d3.csv(path + "annotations.csv", function(error, data){
+  
+  input2 = $.map(data, function(el, i){
+      var start = parseInt(el.start) / 1000;
+      var end = parseInt(el.finish) / 1000;
+      return  start + "," + end;
+   });
+   console.log(input);
+  });
 	// MODIFY ABOVE CODE TO CHANGE TO NEW DATASET
 
   $("#videoFrame").on("timeupdate", function(t) {
     var video_time = t.currentTarget.currentTime;
-		console.log(video_time);
+		// console.log(video_time);
     var sensor_time = video_begin + video_time
     if ((video_begin + video_time) < sensor_begin) {
       drawCursor(0);

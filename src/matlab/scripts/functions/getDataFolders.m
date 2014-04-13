@@ -14,5 +14,5 @@ for i = 1:size(D,1)
        dataIndex{i,2} = x;
     end
 end
-dataIndex(end-1:end,:) = [];
+dataIndex(end-2:end,:) = [];
 end

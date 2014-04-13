@@ -15,9 +15,9 @@ def sample_csv(filename, outfilename):
             
 if __name__ == '__main__':
 	# change the trial number here
-	num = str(16)
+	num = str(51)
 	# change the trial name here
-	name = num + '-hammer'
+	name = num + '-mixedscrew'
 	from_str = 'data/'+name+'/'+num+'-data.csv'
 	to_str = 'data/'+name+'/'+num+'-sampled.csv'
 	sample_csv(from_str,to_str)

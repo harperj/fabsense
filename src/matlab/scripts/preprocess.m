@@ -157,7 +157,7 @@ end
 
 clear a f s i j times len
 
-%% build rms features
+%% build rms and variance features
 %{
 for each signal and axis in each window, we compute the rms and add it to
 the feature matrix. Window size is consistent but count of samples varies.
@@ -167,11 +167,28 @@ n = 1;
 
 %loop through each window, then each sensor, then each axis
 for i = 1:buckets
+    %ugh this is horrible programming but whatever. First we do rms
     for j = 1:numel(sen)
         for k = 1:3
            % adds the rms signal of the samples in the window
            d.features(i,n) =...
                rms(abs(d.windows{i}.(sen{j})(k,:)));
+
+           d.features(i,n+1) =...
+               var((d.windows{i}.(sen{j})(k,:)));
+           
+           % this tracks the feature to edit, see featurenames for list
+           n = n+1;
+        end
+    end
+    
+    %NOW WE DO VARIANCE
+    for j = 1:numel(sen)
+        for k = 1:3
+           % adds the rms signal of the samples in the window
+           d.features(i,n) =...
+               var((d.windows{i}.(sen{j})(k,:)));
+           
            % this tracks the feature to edit, see featurenames for list
            n = n+1;
         end
@@ -183,8 +200,13 @@ end
 d.featurenames = {'rms-acc-x','rms-acc-y','rms-acc-z'...
     ,'rms-gyr-x','rms-gyr-y','rms-gyr-z'...
     ,'rms-mag-x','rms-mag-y','rms-mag-z'};
+          temp = {'var-acc-x','var-acc-y','var-acc-z'...
+    ,'var-gyr-x','var-gyr-y','var-gyr-z'...
+    ,'var-mag-x','var-mag-y','var-mag-z'};
 
-clear n i j k 
+d.featurenames = [d.featurenames , temp];
+
+clear n i j k temp
 %% build the rms signal 
 %{
 for each signal acc, gyr, and mag, we take the x,y, and z values at each

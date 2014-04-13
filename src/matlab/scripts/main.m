@@ -1,4 +1,5 @@
 %%
+clear all; close all;
 cd ~/Documents/Research/fabsense/src/matlab/scripts
 addpath functions
 dataindex = getDataFolders;
@@ -22,8 +23,10 @@ end
 clear i ind
 
 %% Train the classifier
-trainNums = [5,6,7,10,11,14,15,16,17,18,19];
-[training,classifier,wordLabels] = buildClassifier(trainNums);
+trainNums = [5,8,9,10,11,14,15,16,17,18,19];
+%testing the effect of adding features
+featurelist = (1:18);
+[training,classifier,wordLabels] = buildClassifier(trainNums,featurelist);
 
 %% save the classifier
 filename = 'classifier.mat';
@@ -38,7 +41,7 @@ save(filename,'wordLabels');
 clear filename testfolder wordLabels classifier
 
 %% Load test data
-testNum = 8;
+testNum = 6;
 
 % find the test data set and call load data. Returns only the necessary
 % parts of the preprocessed data. 
@@ -57,7 +60,7 @@ dummylabels = ones(size(test.features,1),1) * 10;
 
 %do the testing
 test.sparsefeatures = sparse(test.features);
-[predicted.numlabels, ~, ~] = ...
+[predicted.numlabels, ~, est] = ...
     predict(dummylabels,test.sparsefeatures,classifier,'-q');
 
 %check with the annotations
@@ -75,10 +78,12 @@ if test.annotations
     end
     
     %now check the accuracy
+    fprintf('The classification accuracy was: %s \n', ...
+        sum(accuracy)/length(accuracy));
     
 end
 
-clear i wordLabels labelsfile dummylabels classifierfile
+clear i labelsfile dummylabels classifierfile
 
 %%here's where I left off on saturday night. loadTest needs to be fully
 %%written out then the test portion. then, if there's annotations, the
@@ -101,17 +106,38 @@ be optional and the output will be a csv for use in demoCut and accuracy
 
 %% smoothing
 
-predicted.classlabels = zeros(104,4);
+predicted.classlabels = zeros(length(predicted.numlabels),4);
+numClasses = size(wordLabels,1);
 
-predicted.classlabels(:,1) = (predicted.numlabels(:,1) == 1);
-predicted.classlabels(:,2) = (predicted.numlabels(:,1) == 2);
-predicted.classlabels(:,3) = (predicted.numlabels(:,1) == 3);
-predicted.classlabels(:,4) = (predicted.numlabels(:,1) == 4);
+for i  = 1:numClasses
+    predicted.classlabels(:,i) = (predicted.numlabels(:,1) == i);
+    predicted.classlabels(:,(numClasses+i)) = ...
+        conv(predicted.classlabels(:,i),[1,1,1,1,1],'same');
+end
 
-predicted.classlabels(:,5) = conv(predicted.classlabels(:,1),[1,1,1],'same');
-predicted.classlabels(:,6) = conv(predicted.classlabels(:,2),[1,1,1],'same');
-predicted.classlabels(:,7) = conv(predicted.classlabels(:,3),[1,1,1],'same');
-predicted.classlabels(:,8) = conv(predicted.classlabels(:,4),[1,1,1],'same');
+[~,I] = max(predicted.classlabels(:,numClasses+1:end),[],2);
+predicted.labels(:,2)    = num2class(I,wordLabels);
+predicted.numlabels(:,2) = I;
 
+if test.annotations
+    compare = [test.labels,predicted.labels(:,2)];
+end
 
+%% meaningful output!
+class = predicted.numlabels(1,2);
+start = 1;
+predicted.output = [];
+
+for i = 2:size(predicted.labels,1)
+    c = predicted.numlabels(i,2);
+    if c ~= class
+        fin = i - 1;
+        predicted.output = [predicted.output; [class, start, fin]];
+        class = c;
+        start = i;
+    elseif i == size(predicted.labels,1)
+        fin = i;
+        predicted.output = [predicted.output; [class, start, fin]];
+    end
+end
 

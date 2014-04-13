@@ -1,4 +1,4 @@
-var margin = {top: 20, right: 80, bottom: 20, left: 50},
+var margin = {top: 20, right: 80, bottom: 20, left: 51},
     width = 960 - margin.left - margin.right,
     height = 200 - margin.top - margin.bottom;
 
@@ -40,11 +40,11 @@ function loadD3() {
 
 	// MODIFY BELOW CODE TO CHANGE TO NEW DATASET
 
-  d3.text("19-times.txt", function(error, text) {
+  d3.text("data/51-mixedscrew/51-times.txt", function(error, text) {
     video_begin = parseFloat(text.split("\n",1)[0]);
   });
 
-  d3.csv("19-sampled.csv", function(error, data) {
+  d3.csv("data/51-mixedscrew/51-sampled.csv", function(error, data) {
     sensor_begin = parseFloat(data[0]['timestamp']);
     buildTimeSeries(data, "acc", function(key) {return (key.charAt(0) == 'a');});
     buildTimeSeries(data, "gyr", function(key) {return (key.charAt(0) == 'g');});
@@ -137,7 +137,7 @@ function buildTimeSeries(data, divId, filter) {
      .attr("x", x(new Date(sensor_begin)))
      .attr("y", 0)
      .attr("width", 1)
-     .attr("height", 150);
+     .attr("height", 151);
 
   var city = svg.selectAll(".city")
       .data(cities)
@@ -153,7 +153,7 @@ function buildTimeSeries(data, divId, filter) {
       .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
       .attr("transform", function(d) { return "translate(" + x(d.value.timestamp) + "," + y(d.value.val) + ")"; })
       .attr("x", 3)
-      .attr("dy", ".35em")
+      .attr("dy", ".38em")
       .text(function(d) { return d.name; });
       
   svg.append("g")

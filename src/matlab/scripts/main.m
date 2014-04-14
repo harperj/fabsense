@@ -10,7 +10,7 @@ base = [8,9,10,11,14,15,16,17,18,19];
 kevin = 20:34;
 molly = [36,38,39,40,41,42,43,44,45,46,47,49,50,51];
 
-winsize = 0.25;
+winsize = 0.4;
 
 %% One way to call preProcessFunc is to loop through the dataIndex
 for i = 1:size(dataindex,1)

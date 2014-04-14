@@ -102,7 +102,7 @@ function prepareData(trialnum,foldername,winSize)
         d.windows{i} = tempStruct; 
     end
 
-    clear winSize start diff i j k tmp tempStruct s f 
+    clear start diff i j k tmp tempStruct s f 
 
     %% build feauture vector and labels
     d.features = [];
@@ -207,7 +207,8 @@ d.featurenames = [d.featurenames , temp];
 clear n i j k temp
 
 %% Build the ratio features
-%
+% a super quick and dirty way to get the ratio of 1 to all the others ,
+% then 2 to the others less 1, and so on. 
 k = 1;
 for i = 1:8
     for j = i+1:9
@@ -219,29 +220,80 @@ end
 
 clear i j k
 
-    %% build the rms signal 
-    %{
+%% build the rms signal
+%{
     for each signal acc, gyr, and mag, we take the x,y, and z values at each
     point and find the magnitude, which is the root sum of the squares. In this
     case we use rms since the value of n is always 3.
-    %}
-    sen = {'acc','gyr','mag'};
-    ax = {'x','y','z'};
-    tmp = zeros(1,3);
+%}
+sen = {'acc','gyr','mag'};
+ax = {'x','y','z'};
+tmp = zeros(1,3);
 
-    %loop through each sensor, then each timestamp, then each axis
-    for i = 1:numel(sen)
-        for j = 1:length(d.time)
-            for k = 1:numel(ax)
-                %temp is all thres axes at one time
-                tmp(k) = d.(sen{i}).(ax{k})(j);
-            end
-            %here's where the magic happens
-            d.(sen{i}).rms(j,1) = rms(tmp);
-        end   
+%loop through each sensor, then each timestamp, then each axis
+for i = 1:numel(sen)
+    for j = 1:length(d.time)
+        for k = 1:numel(ax)
+            %temp is all thres axes at one time
+            tmp(k) = d.(sen{i}).(ax{k})(j);
+        end
+        %here's where the magic happens
+        d.(sen{i}).rms(j,1) = rms(tmp);
     end
+end
 
-    clear i j k tmp ax
+clear i j k tmp ax
+
+%this puts and rms signal in the windows. 
+for i = 1:length(d.windows)
+   for j = 1:numel(sen)
+    d.windows{i}.(sen{j})(4,:) = ...
+        rms(d.windows{i}.(sen{j}),1);
+   end
+end
+
+
+%% ahh!! here comes FFT
+
+fftadd = zeros(length(d.windows),24);
+
+for i = 1:length(d.windows)
+    
+    for j = 1:numel(sen)
+        temp = d.windows{i}.(sen{j})(4,:);
+        T = winSize;
+        NFFT = length(temp);
+        fs = NFFT/T;
+        df = fs/NFFT;
+        fAxis = 0:df:(fs-df);
+        F = abs(fft(temp,NFFT));
+%         figure(2)
+%         plot(fAxis(1:floor(end/2)),log(2.*F(1:floor(end/2))),'r')
+
+        F = log(2.*F(1:floor(end/2))+0.001);
+        fAxis = fAxis(1:floor(end/2));
+        
+        fftfeatures = zeros(1,8);
+        
+        edges = [0,1,5,10,20,30,40,50,60];
+        
+        for k = 1:(length(edges)-1)
+            feat = max(F(edges(k) < fAxis & fAxis <= edges(k+1)));
+            if k == 1
+                fftfeatures(k) = F(1);
+            elseif ~size(feat,2)
+                fftfeatures(k) = -5;
+            else
+                fftfeatures(k) = feat;
+            end
+        end
+        
+        fftadd(i,(j*8-7):(j*8)) = fftfeatures;
+        
+    end
+end
+
+d.features = [d.features,fftadd];
 
     %% save the whole workspace in the directory
     filename = [foldername  trialnum '-formatted.mat'];

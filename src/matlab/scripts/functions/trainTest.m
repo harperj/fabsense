@@ -1,65 +1,48 @@
-%%
-clear all; close all;
-cd ~/Documents/Research/fabsense/src/matlab/scripts
-addpath functions
-dataindex = getDataFolders;
-clc
+function [accuracy,predicted] = trainTest(trainNums,testNums,...
+    leaveout,featurelist,dataindex)
 
-
-%% One way to call preProcessFunc is to loop through the dataIndex
-for i = 1:size(dataindex,1)
-    fprintf('Attempting to load file: %s \n',dataindex{i,1});
-    prepareData(dataindex{i,2},dataindex{i,1})
-end
-
-%% Another method is to find the index that matches a search 
-
-%trialNums = [5,6,7,8,9,10,11,14,15,16,17,18,19];
-trialNums = 20:34;
-
-for i = 1:length(trialNums)
-    ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
-    prepareData(dataindex{ind,2},dataindex{ind,1})
-end
-
-clear i ind
-
-%% example use of trainTest.m 
-%(trainNums,testNums,leaveout,featurelist,dataindex)
-dataindex   = getDataFolders;
-leaveout    = true;
-featurelist = false;        %false means no special feautres, train all.
-
-%here's the function call
-[accuracy, predicted] = traintest([1,2,3,5,6],[1,2,3],...
-    leaveout,featurelist,dataindex);
+% train a single classifier if acceptable
+if ~leaveout
+    % train
+    [~,classifier,wordLabels] = ...
+        buildClassifier(trainNums,featurelist);
     
-%%
+    %and save classifier
+    filename = 'classifier.mat';
+    testfolder = '../../../data/test-classifier/';
+    filename = [testfolder, filename];
+    save(filename,'classifier');
+    
+    %save the word lookup
+    filename = [testfolder, 'label-lookup'];
+    save(filename,'wordLabels');
+else
+    
+   
+end
 
-%% Train the classifier
-trainNums = [5,8,9,10,11,14,15,16,17,18,19];
-trainNums = [trainNums, (20:34)];
-%testing the effect of adding features
-%featurelist = 1:18;
-featurelist = false;
-[training,classifier,wordLabels] = buildClassifier(trainNums,featurelist);
+%% main testing loop
+%now comes the main testing loop
+for i = 1:length(testNums)
+    if leaveout
+        %train classifier
+        trainNums(find(trainNums == testNums(i))) = [];
+        [~,classifier,wordLabels] = ...
+            buildClassifier(trainNums,featurelist);
+    end
+    
+    %load the test data
+    testfolder = dataindex{find(cell2mat(dataindex(:,2)) == ...
+        testNums(i),1,'first'),1};
+    
+end   
 
-%% save the classifier
-filename = 'classifier.mat';
-testfolder = '../../../data/test-classifier/';
-filename = [testfolder, filename];
-save(filename,'classifier');
-
-%save the word lookup
-filename = [testfolder, 'label-lookup'];
-save(filename,'wordLabels');
-
-clear filename testfolder wordLabels classifier
 
 %% Load test data
 testNum = 23;
 testfolder = dataindex{find(cell2mat(dataindex(:,2)) == testNum...
     ,1,'first'),1};
+
 % find the test data set and call load data. Returns only the necessary
 % parts of the preprocessed data. 
 test = loadTest(testNum,testfolder);
@@ -101,24 +84,8 @@ end
 
 clear i labelsfile dummylabels classifierfile
 
-%% smoothing
-
-predicted.classlabels = zeros(length(predicted.numlabels),4);
-numClasses = size(wordLabels,1);
-
-for i  = 1:numClasses
-    predicted.classlabels(:,i) = (predicted.numlabels(:,1) == i);
-    predicted.classlabels(:,(numClasses+i)) = ...
-        conv(predicted.classlabels(:,i),[1,1,1,1,1],'same');
-end
-
-[~,I] = max(predicted.classlabels(:,numClasses+1:end),[],2);
-predicted.labels(:,2)    = num2class(I,wordLabels);
-predicted.numlabels(:,2) = I;
-
-if test.annotations
-    compare = [test.labels,predicted.labels(:,2)];
-end
+%% smoothing: performs convolution to remove random labels
+predicted = smoothOutput(predicted,wordLabels);
 
 %% meaningful output!
 class = predicted.numlabels(1,2);

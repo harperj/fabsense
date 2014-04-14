@@ -26,9 +26,10 @@ clear i ind
 
 %% Train the classifier
 trainNums = [5,8,9,10,11,14,15,16,17,18,19];
-trainNums = [trainNums, (20:34)];
+%trainNums = [trainNums, (20:34)];
 %testing the effect of adding features
-featurelist = 1:18;
+%featurelist = 1:18;
+featurelist = false;
 [training,classifier,wordLabels] = buildClassifier(trainNums,featurelist);
 
 %% save the classifier
@@ -44,7 +45,7 @@ save(filename,'wordLabels');
 clear filename testfolder wordLabels classifier
 
 %% Load test data
-testNum = 28;
+testNum = 32;
 testfolder = dataindex{find(cell2mat(dataindex(:,2)) == testNum...
     ,1,'first'),1};
 % find the test data set and call load data. Returns only the necessary
@@ -88,25 +89,6 @@ end
 
 clear i labelsfile dummylabels classifierfile
 
-%%here's where I left off on saturday night. loadTest needs to be fully
-%%written out then the test portion. then, if there's annotations, the
-%%accuracy needs to be compared. Finally, a simple output script. 
-
-
-
-
-%{
-Ideally I would have a list of trials for training and a list of trials for
-testing. You could run this main script on these. 
-
-You could also have a section for cross validation as a function. 
-
-In the user study we will have the classifier built so it will be something
-like a list of test trials and the chosen classifier. The annotation will
-be optional and the output will be a csv for use in demoCut and accuracy
-(if annotations included). 
-%}
-
 %% smoothing
 
 predicted.classlabels = zeros(length(predicted.numlabels),4);
@@ -146,11 +128,6 @@ end
 
 %% test
 output = [];
-
-%open the file to write
-% filename = ['../../../data/test-classifier/',testNum,'-output.csv'];
-% fileID = fopen(filename,'w');
-% formatspec = '%s %d 
 
 for i = 1:size(predicted.output,1)
     label = num2class(predicted.output(i,1),wordLabels);

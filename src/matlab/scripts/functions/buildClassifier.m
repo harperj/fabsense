@@ -93,7 +93,11 @@ clear diff I noise TF M N uniq classes
 
 %% Actually build the classifier
 %make the feature vectors sparse
-training.sparsefeatures = sparse(training.features(:,featurelist));
+if featurelist == false
+    training.sparsefeatures = sparse(training.features);
+else
+    training.sparsefeatures = sparse(training.features(:,featurelist));
+end
 
 %train and test
 classifier = train(training.numlabels,training.sparsefeatures);

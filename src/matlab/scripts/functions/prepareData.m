@@ -204,6 +204,20 @@ d.featurenames = {'rms-acc-x','rms-acc-y','rms-acc-z'...
 d.featurenames = [d.featurenames , temp];
 
 clear n i j k temp
+
+%% Build the ratio features
+%
+k = 1;
+for i = 1:8
+    for j = i+1:9
+        %fprintf('Ratio: %d \\ %d \n',i,j);
+        d.features(:,18+k) = d.features(:,i) ./ d.features(:,j);
+        k = k+1;
+    end
+end
+
+clear i j k
+
     %% build the rms signal 
     %{
     for each signal acc, gyr, and mag, we take the x,y, and z values at each

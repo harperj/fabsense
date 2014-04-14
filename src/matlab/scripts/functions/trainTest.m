@@ -1,5 +1,5 @@
 function [accuracy,predicted,log] = trainTest(trainNums,testNums,...
-    leaveout,featurelist,dataindex)
+    leaveout,featurelist,dataindex,winsize)
 
 % train a single classifier if acceptable
 if ~leaveout
@@ -103,10 +103,10 @@ if(~exist(filename,'file'))
 end
 
 if leaveout
-    log = {testNums(i),accuracy(i)*100,0,0,0,0.25,...
+    log = {testNums(i),accuracy(i)*100,0,0,0,winsize,...
         mat2str(double(featurelist)),mat2str(temp)};
 else
-    log = {testNums(i),accuracy(i)*100,0,0,0,0.25,...
+    log = {testNums(i),accuracy(i)*100,0,0,0,winsize,...
         mat2str(double(featurelist)),mat2str(trainNums)};
 end
 format = '%5d %3.3f %5d %5d %5d %5.2f %s %s \n';

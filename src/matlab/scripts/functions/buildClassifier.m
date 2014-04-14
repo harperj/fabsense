@@ -41,6 +41,11 @@ end
 
 clear data
 %% convert labels
+%oops handle my naming errors
+training.labels(strcmp('sawing',training.labels)) = {'saw'};
+training.labels(strcmp('drilling',training.labels)) = {'drill'};
+training.labels(strcmp('hammering',training.labels)) = {'hammer'}; 
+
 uniq  = unique(training.labels);
 classes = length(uniq);
 training.numlabels = zeros(length(training.labels),1);
@@ -99,6 +104,6 @@ else
 end
 
 %train and test
-classifier = train(training.numlabels,training.sparsefeatures);
+classifier = train(training.numlabels,training.sparsefeatures,'-s 2 -q');
 end
 

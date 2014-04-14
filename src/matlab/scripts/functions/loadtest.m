@@ -21,6 +21,12 @@ end
 load(filename);
 
 test.labels    = [d.labels];
+
+%oops handle my naming errors
+test.labels(strcmp('sawing',test.labels)) = {'saw'};
+test.labels(strcmp('drilling',test.labels)) = {'drill'};
+test.labels(strcmp('hammering',test.labels)) = {'hammer'}; 
+
 test.features  = [d.features];
 test.timestamp = [d.bins];
 test.annotations = [d.annotations];

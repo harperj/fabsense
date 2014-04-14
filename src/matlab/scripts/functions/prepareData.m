@@ -1,4 +1,4 @@
-function prepareData(trialnum,foldername)
+function prepareData(trialnum,foldername,winSize)
     %% a functionized version of preprocess.m
     %{  
     Created:    4/4/2014
@@ -44,7 +44,7 @@ function prepareData(trialnum,foldername)
     time, c. 2 is number of samples in that bin, c. 3 is starting sample index,
     and c. 4 is ending sample index. 
     %}
-    winSize = .25;
+    %winSize = .25;
     start   = d.time(1);
     diff    = d.time(end) - start;
     buckets = ceil(diff/winSize);
@@ -144,6 +144,7 @@ function prepareData(trialnum,foldername)
         [len,~] = size(d.ann.times);
 
         for i = 1:len
+            %this is inclusive time, go me!
             s = find(d.bins(:,1) > times(i,1),1,'first');
             f = find(d.bins(:,1) < times(i,2),1,'last');
             for j = s:f

@@ -5,37 +5,43 @@ addpath functions
 dataindex = getDataFolders;
 clc
 
+%% 
+base = [8,9,10,11,14,15,16,17,18,19];
+kevin = 20:34;
+molly = [36,38,39,40,41,42,43,44,45,46,47,49,50,51];
+
+winsize = 0.25;
 
 %% One way to call preProcessFunc is to loop through the dataIndex
 for i = 1:size(dataindex,1)
     fprintf('Attempting to load file: %s \n',dataindex{i,1});
-    prepareData(dataindex{i,2},dataindex{i,1})
+    prepareData(dataindex{i,2},dataindex{i,1},winsize)
 end
 
 %% Another method is to find the index that matches a search 
 
-trialNums = [5,6,7,8,9,10,11,14,15,16,17,18,19];
-%trialNums = 20:34;
+trialNums = [base,kevin,molly];
 
 for i = 1:length(trialNums)
     ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
-    prepareData(dataindex{ind,2},dataindex{ind,1})
+    prepareData(dataindex{ind,2},dataindex{ind,1},winsize)
 end
 
 clear i ind
 
 %% example use of trainTest.m 
 %(trainNums,testNums,leaveout,featurelist,dataindex)
-trainNums   = [5,6,7,8,9,10,11,14,15,16,17,18,19];
-testNums    = [5,6,7,8,9,10,11,14,15,16,17,18,19];
+trainNums   = [base,kevin,molly];
+testNums   = [base,kevin,molly]; %[base,kevin,molly];
 dataindex   = getDataFolders;
-clc
+%clc
 leaveout    = true;
-featurelist = (1:18);        %false means no special feautres, train all.
+%featurelist = (1:18);
+featurelist = false;        %false means no special feautres, train all.
 
 %here's the function call
 [accuracy, predicted,log] = trainTest(trainNums,testNums,...
-    leaveout,featurelist,dataindex);
+    leaveout,featurelist,dataindex,winsize);
     
 %% Obsolete code 
         

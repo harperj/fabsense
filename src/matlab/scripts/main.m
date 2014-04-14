@@ -31,7 +31,7 @@ leaveout    = true;
 featurelist = false;        %false means no special feautres, train all.
 
 %here's the function call
-[accuracy, predicted] = traintest([1,2,3,5,6],[1,2,3],...
+[accuracy, predicted] = trainTest([5,6,7,8,9,10],[5,6,7],...
     leaveout,featurelist,dataindex);
     
 %%

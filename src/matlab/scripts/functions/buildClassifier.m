@@ -42,7 +42,6 @@ end
 clear data
 %% convert labels
 uniq  = unique(training.labels);
-disp(uniq)
 classes = length(uniq);
 training.numlabels = zeros(length(training.labels),1);
 
@@ -100,6 +99,6 @@ else
 end
 
 %train and test
-classifier = train(training.numlabels,training.sparsefeatures);
+classifier = train(training.numlabels,training.sparsefeatures,'-q');
 end
 

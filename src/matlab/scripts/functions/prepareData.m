@@ -279,8 +279,12 @@ for i = 1:length(d.windows)
         
         for k = 1:(length(edges)-1)
             feat = max(F(edges(k) < fAxis & fAxis <= edges(k+1)));
-            if k == 1
-                fftfeatures(k) = F(1);
+            if k == 1 
+                if ~size(feat,2)
+                    fftfeatures(k) = -5;
+                else
+                    fftfeatures(k) = F(1);
+                end
             elseif ~size(feat,2)
                 fftfeatures(k) = -5;
             else

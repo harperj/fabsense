@@ -23,6 +23,7 @@ end
 trialNums = [base,kevin,molly];
 
 for i = 1:length(trialNums)
+    disp(trialNums(i));
     ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
     prepareData(dataindex{ind,2},dataindex{ind,1},winsize)
 end

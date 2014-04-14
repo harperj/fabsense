@@ -1,4 +1,4 @@
-function [accuracy,predicted] = trainTest(trainNums,testNums,...
+function [accuracy,predicted,log] = trainTest(trainNums,testNums,...
     leaveout,featurelist,dataindex)
 
 % train a single classifier if acceptable
@@ -25,9 +25,10 @@ accuracy = zeros(length(testNums),1);
 for i = 1:length(testNums)
     if leaveout
         %train classifier
-        trainNums(trainNums == testNums(i)) = [];
+        temp  = trainNums;
+        temp(temp == testNums(i)) = [];
         [~,classifier,wordLabels] = ...
-            buildClassifier(trainNums,featurelist);
+            buildClassifier(temp,featurelist);
     end
     
     %load the test data
@@ -60,13 +61,13 @@ for i = 1:length(testNums)
         
         %now check the accuracy
         accuracy(i) = sum(acc)/length(acc);
-        fprintf('The classification accuracy was: %i \n', ...
-            accuracy(i));
+        fprintf('Classification accuracy trial %d was: %5.3f \n', ...
+            testNums(i), accuracy(i)*100);
     else 
         accuracy(i) = 0;
     end
     
-end   
+  
 clear labelsfile dummylabels classifierfile
 
 %% smoothing: performs convolution to remove random labels
@@ -76,11 +77,50 @@ predicted = smoothOutput(predicted,wordLabels);
 [predicted,output] = convertOutputTime(predicted,test,wordLabels);
 
 %% write the output
-T = cell2table(output,'VariableNames',{'label','start','finish'});
-filename = ['../../../data/test-classifier/',...
-    num2str(testNums(i)),'-classified.csv'];
-writetable(T,filename);
+if size(output,1) > 0
+    T = cell2table(output,'VariableNames',{'label','start','finish'});
+    filename = ['../../../data/test-classifier/outputs/',...
+        num2str(testNums(i)),'-classified.csv'];
+    writetable(T,filename);
+    
+    filename = ['../../../data/', testfolder, '/', ...
+        num2str(testNums(i)),'-classified.csv'];
+    writetable(T,filename);
+end
 
+%% build the log
 filename = ['../../../data/', testfolder, '/', ...
-    num2str(testNums(i)),'-classified.csv'];
-writetable(T,filename);
+    num2str(testNums(i)),'-outputlog.txt'];
+
+if(~exist(filename,'file'))
+    headerline = {'trial','accuracy','window','pass','loss','window',...
+        'features','training'};
+    headerformat = '%s %s %s %s %s %s %s %s \n';
+    FID = fopen(filename,'a+');
+    fprintf(FID,headerformat,headerline{1,:});
+    fclose(FID);
+    disp('crazy')
+end
+
+if leaveout
+    log = {testNums(i),accuracy(i)*100,0,0,0,0.25,...
+        mat2str(double(featurelist)),mat2str(temp)};
+else
+    log = {testNums(i),accuracy(i)*100,0,0,0,0.25,...
+        mat2str(double(featurelist)),mat2str(trainNums)};
+end
+format = '%5d %3.3f %5d %5d %5d %5.2f %s %s \n';
+
+%write to trial folder logs
+FID = fopen(filename,'a');
+fprintf(FID,format,log{1,:});
+fclose(FID);
+
+%write to main log
+filename = '../../../data/test-classifier/outputlog.txt';
+FID = fopen(filename,'a');
+fprintf(FID,format,log{1,:});
+fclose(FID);
+
+end
+end

@@ -99,6 +99,6 @@ else
 end
 
 %train and test
-classifier = train(training.numlabels,training.sparsefeatures,'-q');
+classifier = train(training.numlabels,training.sparsefeatures);
 end
 

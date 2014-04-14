@@ -32,4 +32,5 @@ for i = 1:size(predicted.output,1)
         out = {label,start*1000,finish*1000};
         output = [output;out];
     end 
+end 
 end

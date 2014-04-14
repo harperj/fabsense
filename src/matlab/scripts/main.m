@@ -14,8 +14,8 @@ end
 
 %% Another method is to find the index that matches a search 
 
-%trialNums = [5,6,7,8,9,10,11,14,15,16,17,18,19];
-trialNums = 20:34;
+trialNums = [5,6,7,8,9,10,11,14,15,16,17,18,19];
+%trialNums = 20:34;
 
 for i = 1:length(trialNums)
     ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
@@ -26,15 +26,26 @@ clear i ind
 
 %% example use of trainTest.m 
 %(trainNums,testNums,leaveout,featurelist,dataindex)
+trainNums   = [5,6,7,8,9,10,11,14,15,16,17,18,19];
+testNums    = [5,6,7,8,9,10,11,14,15,16,17,18,19];
 dataindex   = getDataFolders;
+clc
 leaveout    = true;
-featurelist = false;        %false means no special feautres, train all.
+featurelist = (1:18);        %false means no special feautres, train all.
 
 %here's the function call
-[accuracy, predicted] = trainTest([5,6,7,8,9,10],[5,6,7],...
+[accuracy, predicted,log] = trainTest(trainNums,testNums,...
     leaveout,featurelist,dataindex);
     
-%%
+%% Obsolete code 
+        
+
+
+
+
+
+
+%
 
 %% Train the classifier
 trainNums = [5,8,9,10,11,14,15,16,17,18,19];

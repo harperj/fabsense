@@ -304,7 +304,7 @@ d.features = [d.features,fftadd];
     save(filename,'d')
 
     %% save the training set
-    trainfolder = '../../../data/train-classifier/';
+    trainfolder = '../../../data/training-classifier/';
     filename = [trainfolder trialnum '-train.mat'];
     training = struct();
     training.features = d.features;

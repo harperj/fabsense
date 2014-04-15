@@ -24,7 +24,7 @@ No error checking to see if the trial number has been processed
 
 %% Load Training Data
 %relative file path
-trainfolder = '../../../data/train-classifier/';
+trainfolder = '../../../data/training-classifier/';
 
 %prep structures:
 training.labels   = [];

@@ -9,8 +9,9 @@ clc
 base = [8,9,10,11,14,15,16,17,18,19];
 kevin = 20:34;
 molly = [36,38,39,40,41,42,43,44,45,46,47,49,50,51];
-
-winsize = 0.4;
+claire = [52,53,54,55,56,57,58,59,60,61,62,63];
+pablo = [64,65,66,67,68,69];
+winsize = 0.6;
 
 %% One way to call preProcessFunc is to loop through the dataIndex
 for i = 1:size(dataindex,1)
@@ -20,22 +21,22 @@ end
 
 %% Another method is to find the index that matches a search 
 
-trialNums = [base,kevin,molly];
+trialNums = [claire,pablo];
 
 for i = 1:length(trialNums)
-    disp(trialNums(i));
     ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
     prepareData(dataindex{ind,2},dataindex{ind,1},winsize)
 end
 
 clear i ind
 
-%% example use of trainTest.m 
+%%
+% example use of trainTest.m 
 %(trainNums,testNums,leaveout,featurelist,dataindex)
-trainNums   = [base,kevin,molly];
-testNums   = [base,kevin,molly]; %[base,kevin,molly];
+trainNums   = [base(5:end),kevin,molly];
+testNums   = [claire]; 
 dataindex   = getDataFolders;
-%clc
+clc
 leaveout    = true;
 %featurelist = (1:18);
 featurelist = false;        %false means no special feautres, train all.

@@ -33,17 +33,19 @@ clear i ind
 %%
 % example use of trainTest.m 
 %(trainNums,testNums,leaveout,featurelist,dataindex)
-trainNums   = [base(5:end),kevin,molly];
-testNums   = [claire]; 
+trainNums   = [base(5:end),kevin,molly,claire,pablo];
+testNums   = [23]; 
 dataindex   = getDataFolders;
-clc
-leaveout    = true;
+leaveout    = false;
 %featurelist = (1:18);
 featurelist = false;        %false means no special feautres, train all.
 
 %here's the function call
-[accuracy, predicted,log] = trainTest(trainNums,testNums,...
+[wordLabels,training,accuracy, predicted,log] = trainTest(trainNums,testNums,...
     leaveout,featurelist,dataindex,winsize);
+
+fprintf('\n Whole test was: %5.3f \n \n', ...
+        mean(accuracy()*100));
     
 %% Obsolete code 
         

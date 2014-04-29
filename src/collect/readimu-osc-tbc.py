@@ -14,7 +14,7 @@ def log(data, client, csvwriter):
   row = [] 
   tempData = 0.;
   orderSensors = []
-  row.append(str(time.time()))
+  row.append("{:10.6f}".format(time.time()))
   for sensor, setting in gina.iteritems():
     for axis, index in setting["data"].iteritems():
       msg = OSC.OSCMessage()                            if graph else ""

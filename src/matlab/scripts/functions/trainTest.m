@@ -1,5 +1,5 @@
-function [wordLabels,training,accuracy,predicted,log] = trainTest(trainNums,testNums,...
-    leaveout,featurelist,dataindex,winsize)
+function [training,accuracy,predicted,compare] = trainTest(trainNums,testNums,...
+    leaveout,featurelist,dataindex,winsize,smooth)
 
 % train a single classifier if acceptable
 if ~leaveout
@@ -21,13 +21,14 @@ end
 %% main testing loop
 %now comes the main testing loop
 accuracy = zeros(length(testNums),1);
+compare = [];
 
 for i = 1:length(testNums)
     if leaveout
         %train classifier
         temp  = trainNums;
         temp(temp == testNums(i)) = [];
-        [~,classifier,wordLabels] = ...
+        [training,classifier,wordLabels] = ...
             buildClassifier(temp,featurelist);
     end
     
@@ -43,17 +44,28 @@ for i = 1:length(testNums)
     test.sparsefeatures = sparse(test.features);
     [predicted.numlabels, ~, ~] = ...
         predict(dummylabels,test.sparsefeatures,classifier,'-q');
+   
+    
+    %convert the predicted num labels into strings
+    predicted.labels = cell(length(predicted.numlabels),1);
+    
+    % smoothing: performs convolution to remove random labels
+    if smooth
+        predicted = smoothOutput(predicted,wordLabels);
+    else
+        predicted.numlabels(:,2) = predicted.numlabels(:,1);
+    end
     
     %check with the annotations
     if test.annotations
         
-        %convert the predicted num labels into strings
-        predicted.labels = cell(length(predicted.numlabels),1);
+        %convert the predicted num labels into strings and compute accuracy
+        %predicted.labels = cell(length(predicted.numlabels(:,2)),1);
         acc = false(length(predicted.labels),1);
         
         for j = 1:length(predicted.numlabels)
             %returns the name associated with the number
-            predicted.labels{j,1} = wordLabels{predicted.numlabels(j),1};
+            predicted.labels{j,1} = wordLabels{predicted.numlabels(j,2),1};
             
             %now check the accuracy
             acc(j) = strcmp(test.labels(j),predicted.labels(j));
@@ -63,6 +75,12 @@ for i = 1:length(testNums)
         accuracy(i) = sum(acc)/length(acc);
         fprintf('Classification accuracy trial %d was: %5.3f \n', ...
             testNums(i), accuracy(i)*100);
+        
+        % make the compare vectors and append them
+        tempComp = ...
+           [class2num(test.labels,wordLabels),predicted.numlabels(:,2)];
+       compare = [compare;tempComp];
+        
     else 
         accuracy(i) = 0;
     end
@@ -71,7 +89,11 @@ for i = 1:length(testNums)
 clear labelsfile dummylabels classifierfile
 
 %% smoothing: performs convolution to remove random labels
-predicted = smoothOutput(predicted,wordLabels);
+% if smooth
+%     predicted = smoothOutput(predicted,wordLabels);
+% else 
+%     predicted.numlabels(:,2) = predicted.numlabels(:,1);
+% end
 
 %% meaningful output!
 [predicted,output] = convertOutputTime(predicted,test,wordLabels);

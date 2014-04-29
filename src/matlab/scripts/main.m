@@ -11,7 +11,7 @@ kevin = 20:34;
 molly = [36,38,39,40,41,42,43,44,45,46,47,49,50,51];
 claire = [52,53,54,55,56,57,58,59,60,61,62,63];
 pablo = [64,65,66,67,68,69];
-winsize = 0.6;
+winsize = .6;
 
 %% One way to call preProcessFunc is to loop through the dataIndex
 for i = 1:size(dataindex,1)
@@ -21,7 +21,8 @@ end
 
 %% Another method is to find the index that matches a search 
 
-trialNums = [claire,pablo];
+%trialNums = [base,kevin,molly,claire,pablo];
+trialNums = base;
 
 for i = 1:length(trialNums)
     ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
@@ -33,29 +34,34 @@ clear i ind
 %%
 % example use of trainTest.m 
 %(trainNums,testNums,leaveout,featurelist,dataindex)
-trainNums   = [base(5:end),kevin,molly,claire,pablo];
-testNums   = [23]; 
-dataindex   = getDataFolders;
-leaveout    = false;
+trainNums  = [base(5:end),kevin,molly,claire];
+testNums   = [pablo]; 
+dataindex  = getDataFolders;
+leaveout   = false;
+smooth     = true;
 %featurelist = (1:18);
 featurelist = false;        %false means no special feautres, train all.
 
 %here's the function call
-[wordLabels,training,accuracy, predicted,log] = trainTest(trainNums,testNums,...
-    leaveout,featurelist,dataindex,winsize);
+[training, accuracy, predicted,tempCompare] = trainTest(trainNums,testNums,...
+    leaveout,featurelist,dataindex,winsize,smooth);
 
 fprintf('\n Whole test was: %5.3f \n \n', ...
         mean(accuracy()*100));
     
 %% Obsolete code 
         
-
-
-
-
-
-
 %
+
+%% Load test data
+testNum = 23;
+testfolder = dataindex{find(cell2mat(dataindex(:,2)) == testNum...
+    ,1,'first'),1};
+% find the test data set and call load data. Returns only the necessary
+% parts of the preprocessed data. 
+test = loadTest(testNum,testfolder);
+clear ind 
+
 
 %% Train the classifier
 trainNums = [5,8,9,10,11,14,15,16,17,18,19];
@@ -76,15 +82,6 @@ filename = [testfolder, 'label-lookup'];
 save(filename,'wordLabels');
 
 clear filename testfolder wordLabels classifier
-
-%% Load test data
-testNum = 23;
-testfolder = dataindex{find(cell2mat(dataindex(:,2)) == testNum...
-    ,1,'first'),1};
-% find the test data set and call load data. Returns only the necessary
-% parts of the preprocessed data. 
-test = loadTest(testNum,testfolder);
-clear ind 
 
 %% Test the data!
 

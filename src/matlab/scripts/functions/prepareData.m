@@ -21,7 +21,10 @@ function prepareData(trialnum,foldername,winSize)
     d = struct('all',M.data);
     s = {'acc','gyr','mag'};
     ax = {'x','y','z'};
-    d.time = M.data(:,1);
+    
+    %fix the time oversampling 
+    d.time = fixTiming(M.data(:,1));
+    %d.time = (M.data(:,1));
     inc = 2;
 
     %loop through each sensor then each axis
@@ -35,7 +38,7 @@ function prepareData(trialnum,foldername,winSize)
             inc = inc+1;
         end 
     end
-    clear s i j inc filename
+    clear s i j inc filename ind
 
     %% format windows
     %{
@@ -46,13 +49,13 @@ function prepareData(trialnum,foldername,winSize)
     %}
     %winSize = .25;
     start   = d.time(1);
-    diff    = d.time(end) - start;
-    buckets = ceil(diff/winSize);
+    diffs    = d.time(end) - start;
+    buckets = ceil(diffs/winSize);
 
     %reformat time to 0 start
     d.time(:,2) = d.time - d.time(1);
     %build bins
-    d.bins = (0:winSize:diff)';
+    d.bins = (0:winSize:diffs)';
 
     %bin the data, returns bincount and indexes
     [d.bins(:,2),d.time(:,3)] ...
@@ -72,6 +75,7 @@ function prepareData(trialnum,foldername,winSize)
     remove = find(d.bins(:,2)==0);
     d.bins(remove,:) = [];
     buckets = buckets - length(remove);
+    
 
     clear remove
 

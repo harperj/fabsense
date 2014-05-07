@@ -1,4 +1,4 @@
-function prepareData(trialnum,foldername,winSize)
+function prepareDataResample(trialnum,foldername,winSize)
 %% a functionized version of preprocess.m
 %{
     Created:    4/4/2014
@@ -22,12 +22,31 @@ d = struct('all',M.data);
 s = {'acc','gyr','mag'};
 ax = {'x','y','z'};
 
-
-%fix duplicate samples for each timestamp
+%% fix time
+%fix the time oversampling
 d.time = fixTiming(M.data(:,1));
 %d.time = (M.data(:,1));
 
+%resample the data
+fs = 200;
+start = d.time(1);
+diffs = d.time(end) - start;
+tq = 1:(1/fs):max(d.time(:,1));
 
+temp = zeros(length(tq),10);
+temp(:,1) = tq;
+
+for i = 2:10
+    y = d.all(:,i);
+    temp(:,i) = interp1(d.time(:,1),y,tq,'linear');
+end
+
+d.all = temp;
+d.time = tq;
+
+
+
+%% fill the sensor structures with data
 inc = 2;
 %loop through each sensor then each axis
 for i = 1:numel(s)
@@ -36,7 +55,7 @@ for i = 1:numel(s)
     for j = 1:numel(ax)
         %create and fill axes structures
         d.(num2str(cell2mat(s(i))))...
-            .(num2str(cell2mat(ax(j)))) = M.data(:,inc);
+            .(num2str(cell2mat(ax(j)))) = d.all(:,inc);
         inc = inc+1;
     end
 end
@@ -50,8 +69,6 @@ clear s i j inc filename ind
     and c. 4 is ending sample index.
 %}
 %winSize = .25;
-start   = d.time(1);
-diffs    = d.time(end) - start;
 buckets = ceil(diffs/winSize);
 
 %reformat time to 0 start

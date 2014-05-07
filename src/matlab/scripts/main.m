@@ -20,17 +20,13 @@ for i = 1:size(dataindex,1)
 end
 
 %% Another method is to find the index that matches a search 
-tic
 %trialNums = [base,kevin,molly,claire,pablo];
-trialNums = base;
+trialNums = 23;
 
 for i = 1:length(trialNums)
     ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
-    prepareData(dataindex{ind,2},dataindex{ind,1},winsize)
+    prepareDataResample(dataindex{ind,2},dataindex{ind,1},winsize)
 end
-
-toc
-
 clear i ind
 
 %%

@@ -51,6 +51,14 @@ fprintf('\n Whole test was: %5.3f \n \n', ...
         
 %
 
+%% loading a single test manually
+
+ind = find(cell2mat(dataindex(:,2)) == 23,1,'first');
+trialnum = dataindex{ind,2};
+foldername = dataindex{ind,1};
+winSize = 0.6;
+
+
 %% Load test data
 testNum = 23;
 testfolder = dataindex{find(cell2mat(dataindex(:,2)) == testNum...

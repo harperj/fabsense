@@ -25,13 +25,18 @@ ax = {'x','y','z'};
 %% fix time
 %fix the time oversampling
 d.time = fixTiming(M.data(:,1));
+disp('that worked!');
 %d.time = (M.data(:,1));
+
+%%
 
 %resample the data
 fs = 200;
 start = d.time(1);
-diffs = d.time(end) - start;
-tq = 1:(1/fs):max(d.time(:,1));
+finish = d.time(end);
+tq = start:(1/fs):finish;
+
+%%
 
 temp = zeros(length(tq),10);
 temp(:,1) = tq;
@@ -41,10 +46,10 @@ for i = 2:10
     temp(:,i) = interp1(d.time(:,1),y,tq,'linear');
 end
 
+
+
 d.all = temp;
-d.time = tq;
-
-
+d.time = tq';
 
 %% fill the sensor structures with data
 inc = 2;
@@ -69,12 +74,13 @@ clear s i j inc filename ind
     and c. 4 is ending sample index.
 %}
 %winSize = .25;
-buckets = ceil(diffs/winSize);
+difft = finish - start;
+buckets = ceil(difft/winSize);
 
 %reformat time to 0 start
 d.time(:,2) = d.time - d.time(1);
 %build bins
-d.bins = (0:winSize:diffs)';
+d.bins = (0:winSize:difft)';
 
 %bin the data, returns bincount and indexes
 [d.bins(:,2),d.time(:,3)] ...

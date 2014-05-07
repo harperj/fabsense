@@ -281,6 +281,18 @@ for i = 1:length(d.windows)
     end
 end
 
+%%
+temp = [d.windows{35}.(sen{2})(2,:),d.windows{36}.(sen{2})(2,:)];
+T = winSize;
+NFFT = 60;
+fs = NFFT/T;
+df = fs/NFFT;
+fAxis = 0:df:(fs-df);
+F = abs(fft(temp,NFFT));
+figure(2)
+%plot(fAxis(2:floor(end/2)),log(2.*F(2:floor(end/2))),'r-')
+plot(fAxis(2:floor(end/2)),F(2:floor(end/2)),'r-')
+length(F)
 
 %% ahh!! here comes FFT
 
@@ -306,6 +318,7 @@ for i = 1:length(d.windows)
         
         edges = [0,1,5,10,20,30,40,50,60];
         
+        %tries to reconcile the different bins into consisitent bins
         for k = 1:(length(edges)-1)
             feat = max(F(edges(k) < fAxis & fAxis <= edges(k+1)));
             if k == 1

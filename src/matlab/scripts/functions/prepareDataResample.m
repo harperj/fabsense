@@ -1,4 +1,4 @@
-function prepareDataResample(trialnum,foldername,winSize)
+function prepareDataResample(trialnum,foldername,winSize,fftbins)
 %% a functionized version of preprocess.m
 %{
     Created:    4/4/2014
@@ -14,7 +14,7 @@ foldername = ['~/Documents/Research/fabsense/data/',foldername, '/'];
 
 trialnum = num2str(trialnum);
 filename = [foldername  trialnum '-data.csv'];
-%disp(filename)
+%disp(filename) 
 M = importdata(filename,',',1);
 
 global d;
@@ -282,60 +282,69 @@ for i = 1:length(d.windows)
 end
 
 %%
-temp = [d.windows{35}.(sen{2})(2,:),d.windows{36}.(sen{2})(2,:)];
-T = winSize;
-NFFT = 60;
-fs = NFFT/T;
-df = fs/NFFT;
-fAxis = 0:df:(fs-df);
-F = abs(fft(temp,NFFT));
-figure(2)
-%plot(fAxis(2:floor(end/2)),log(2.*F(2:floor(end/2))),'r-')
-plot(fAxis(2:floor(end/2)),F(2:floor(end/2)),'r-')
-length(F)
+% temp = [d.windows{35}.(sen{2})(2,:),d.windows{36}.(sen{2})(2,:)];
+% T = winSize;
+% NFFT = 60;
+% fs = NFFT/T;
+% df = fs/NFFT;
+% fAxis = 0:df:(fs-df);
+% F = abs(fft(temp,NFFT));
+% figure(2)
+% %plot(fAxis(2:floor(end/2)),log(2.*F(2:floor(end/2))),'r-')
+% plot(fAxis(2:floor(end/2)),F(2:floor(end/2)),'r-')
+% length(F)
 
 %% ahh!! here comes FFT
 
-fftadd = zeros(length(d.windows),24);
+%the fft features are one sum for each sensor
+fftadd = zeros(length(d.windows),fftbins*3);
 
 for i = 1:length(d.windows)
     
+    %loop over sensors
     for j = 1:numel(sen)
-        temp = d.windows{i}.(sen{j})(4,:);
-        T = winSize;
-        NFFT = length(temp);
-        fs = NFFT/T;
-        df = fs/NFFT;
-        fAxis = 0:df:(fs-df);
-        F = abs(fft(temp,NFFT));
-        %         figure(2)
-        %         plot(fAxis(1:floor(end/2)),log(2.*F(1:floor(end/2))),'r')
-        
-        F = log(2.*F(1:floor(end/2))+0.001);
-        fAxis = fAxis(1:floor(end/2));
-        
-        fftfeatures = zeros(1,8);
-        
-        edges = [0,1,5,10,20,30,40,50,60];
-        
-        %tries to reconcile the different bins into consisitent bins
-        for k = 1:(length(edges)-1)
-            feat = max(F(edges(k) < fAxis & fAxis <= edges(k+1)));
-            if k == 1
-                if ~size(feat,2)
-                    fftfeatures(k) = -5;
-                else
-                    fftfeatures(k) = F(1);
-                end
-            elseif ~size(feat,2)
-                fftfeatures(k) = -5;
-            else
-                fftfeatures(k) = feat;
-            end
+        %loop over axes
+        for k = 1:3;
+            
+            temp = d.windows{i}.(sen{j})(k,:);
+            T = winSize;
+            NFFT = fftbins*2;
+            fs = NFFT/T;
+            df = fs/NFFT;
+            %fAxis = 0:df:(fs-df);
+            F = abs(fft(temp,NFFT));
+            F = F(1:floor(end/2));
+            
+            %adds the ffts in each axis to their sensor, then in each sensor
+            %has its own section
+            fftadd(i,(1+(j-1)*fftbins):j*fftbins) = ...
+                fftadd(i,(1+(j-1)*fftbins):j*fftbins) + F;
+            
+            %         fAxis = fAxis(1:floor(end/2));
+            %
+            %         fftfeatures = zeros(1,8);
+            %
+            %         edges = [0,1,5,10,20,30,40,50,60];
+            %
+            %         %tries to reconcile the different bins into consisitent bins
+            %         for k = 1:(length(edges)-1)
+            %             feat = max(F(edges(k) < fAxis & fAxis <= edges(k+1)));
+            %             if k == 1
+            %                 if ~size(feat,2)
+            %                     fftfeatures(k) = -5;
+            %                 else
+            %                     fftfeatures(k) = F(1);
+            %                 end
+            %             elseif ~size(feat,2)
+            %                 fftfeatures(k) = -5;
+            %             else
+            %                 fftfeatures(k) = feat;
+            %             end
+            %         end
+            %
+            %         fftadd(i,(j*8-7):(j*8)) = fftfeatures;
+            
         end
-        
-        fftadd(i,(j*8-7):(j*8)) = fftfeatures;
-        
     end
 end
 

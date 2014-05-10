@@ -14,12 +14,6 @@ pablo = [64,65,66,67,68,69];
 winsize = .6;
 fftbins = 30;
 
-%% One way to call preProcessFunc is to loop through the dataIndex
-for i = 1:size(dataindex,1)
-    fprintf('Attempting to load file: %s \n',dataindex{i,1});
-    prepareData(dataindex{i,2},dataindex{i,1},winsize)
-end
-
 %% Another method is to find the index that matches a search 
 trialNums = [base,kevin,molly,claire,pablo];
 %trialNums = 23;
@@ -30,19 +24,18 @@ for i = 1:length(trialNums)
 end
 clear i ind
 
-%%
-% example use of trainTest.m 
+%% example use of trainTest.m 
 %(trainNums,testNums,leaveout,featurelist,dataindex)
 trainNums  = [base(5:end),kevin,molly,claire,pablo];
-testNums   = [kevin]; 
+testNums   = [base(5:end),kevin,molly,claire,pablo]; 
 dataindex  = getDataFolders;
-leaveout   = false;
+leaveout   = true;
 smooth     = true;
 %featurelist = (1:18);
-featurelist = false;        %false means no special feautres, train all.
+featurelist = 1:54;        %false means no special feautres, train all.
 
 %here's the function call
-[training, accuracy, predicted,tempCompare] = trainTest(trainNums,testNums,...
+[~, accuracy, predicted,tempCompare] = trainTest(trainNums,testNums,...
     leaveout,featurelist,dataindex,winsize,smooth);
 
 fprintf('\n Whole test was: %5.3f \n \n', ...
@@ -52,8 +45,63 @@ fprintf('\n Whole test was: %5.3f \n \n', ...
         
 %
 
-%% loading a single test manually
+%% a linear search for an optimum
 
+winsizes = [.2,.4,.6,.8,1,1.5];
+fftbins = [5,10,20,30,40,50,60];
+leaveoutlist = [true,false];
+
+gridsearch = zeros(length(winsizes),length(fftbins),2);
+
+for i = 2:length(winsizes);
+    for j = 1:length(fftbins);
+        
+        trialNums = [base,kevin,molly,claire,pablo];
+        
+        for l = 1:length(trialNums)
+            ind = find(cell2mat(dataindex(:,2)) == trialNums(l),1,'first');
+            prepareDataResample(dataindex{ind,2},...
+                dataindex{ind,1},winsizes(i),fftbins(j));
+        end
+        
+        for k  = 1:2;
+            trainNums  = [base(5:end),kevin,molly,claire,pablo];
+            testNums   = [base(5:end),kevin,molly,claire,pablo];
+            dataindex  = getDataFolders;
+            leaveout   = leaveoutlist(k);
+            smooth     = true;
+            winsize = winsizes(i);
+            %featurelist = (1:18);
+            featurelist = false;        %false means no special feautres, train all.
+            
+            
+            %here's the function call
+            [~, accuracy, predicted,tempCompare] = trainTest(trainNums,testNums,...
+                leaveout,featurelist,dataindex,winsize,smooth);
+            fprintf('\n WindowSize: %2.2f fftBins: %2.0f Leavout: %d \n', ...
+                winsizes(i),fftbins(j),leaveoutlist(k));
+            fprintf('Whole test was: %5.3f \n \n', ...
+                mean(accuracy()*100));
+            
+            gridsearch(i,j,k) = mean(accuracy()*100);
+            fclose('all');
+        end
+    end
+end
+
+    
+
+
+
+
+%% One way to call preProcessFunc is to loop through the dataIndex
+%this method doesn't work because the data is kind of broken.
+for i = 1:size(dataindex,1)
+    fprintf('Attempting to load file: %s \n',dataindex{i,1});
+    prepareData(dataindex{i,2},dataindex{i,1},winsize)
+end
+
+%%
 ind = find(cell2mat(dataindex(:,2)) == 23,1,'first');
 trialnum = dataindex{ind,2};
 foldername = dataindex{ind,1};

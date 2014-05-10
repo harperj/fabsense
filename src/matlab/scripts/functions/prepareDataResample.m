@@ -22,10 +22,13 @@ d = struct('all',M.data);
 s = {'acc','gyr','mag'};
 ax = {'x','y','z'};
 
+%% take log of all data
+
+
 %% fix time
 %fix the time oversampling
 d.time = fixTiming(M.data(:,1));
-disp('that worked!');
+%disp('that worked!');
 %d.time = (M.data(:,1));
 
 %%
@@ -250,36 +253,36 @@ end
 clear i j k
 
 %% build the rms signal
-%{
-    for each signal acc, gyr, and mag, we take the x,y, and z values at each
-    point and find the magnitude, which is the root sum of the squares. In this
-    case we use rms since the value of n is always 3.
-%}
-sen = {'acc','gyr','mag'};
-ax = {'x','y','z'};
-tmp = zeros(1,3);
-
-%loop through each sensor, then each timestamp, then each axis
-for i = 1:numel(sen)
-    for j = 1:length(d.time)
-        for k = 1:numel(ax)
-            %temp is all thres axes at one time
-            tmp(k) = d.(sen{i}).(ax{k})(j);
-        end
-        %here's where the magic happens
-        d.(sen{i}).rms(j,1) = rms(tmp);
-    end
-end
-
-clear i j k tmp ax
-
-%this puts and rms signal in the windows.
-for i = 1:length(d.windows)
-    for j = 1:numel(sen)
-        d.windows{i}.(sen{j})(4,:) = ...
-            rms(d.windows{i}.(sen{j}),1);
-    end
-end
+% %{
+%     for each signal acc, gyr, and mag, we take the x,y, and z values at each
+%     point and find the magnitude, which is the root sum of the squares. In this
+%     case we use rms since the value of n is always 3.
+% %}
+% sen = {'acc','gyr','mag'};
+% ax = {'x','y','z'};
+% tmp = zeros(1,3);
+% 
+% %loop through each sensor, then each timestamp, then each axis
+% for i = 1:numel(sen)
+%     for j = 1:length(d.time)
+%         for k = 1:numel(ax)
+%             %temp is all thres axes at one time
+%             tmp(k) = d.(sen{i}).(ax{k})(j);
+%         end
+%         %here's where the magic happens
+%         d.(sen{i}).rms(j,1) = rms(tmp);
+%     end
+% end
+% 
+% clear i j k tmp ax
+% 
+% %this puts and rms signal in the windows.
+% for i = 1:length(d.windows)
+%     for j = 1:numel(sen)
+%         d.windows{i}.(sen{j})(4,:) = ...
+%             rms(d.windows{i}.(sen{j}),1);
+%     end
+% end
 
 %%
 % temp = [d.windows{35}.(sen{2})(2,:),d.windows{36}.(sen{2})(2,:)];
@@ -319,31 +322,6 @@ for i = 1:length(d.windows)
             %has its own section
             fftadd(i,(1+(j-1)*fftbins):j*fftbins) = ...
                 fftadd(i,(1+(j-1)*fftbins):j*fftbins) + F;
-            
-            %         fAxis = fAxis(1:floor(end/2));
-            %
-            %         fftfeatures = zeros(1,8);
-            %
-            %         edges = [0,1,5,10,20,30,40,50,60];
-            %
-            %         %tries to reconcile the different bins into consisitent bins
-            %         for k = 1:(length(edges)-1)
-            %             feat = max(F(edges(k) < fAxis & fAxis <= edges(k+1)));
-            %             if k == 1
-            %                 if ~size(feat,2)
-            %                     fftfeatures(k) = -5;
-            %                 else
-            %                     fftfeatures(k) = F(1);
-            %                 end
-            %             elseif ~size(feat,2)
-            %                 fftfeatures(k) = -5;
-            %             else
-            %                 fftfeatures(k) = feat;
-            %             end
-            %         end
-            %
-            %         fftadd(i,(j*8-7):(j*8)) = fftfeatures;
-            
         end
     end
 end

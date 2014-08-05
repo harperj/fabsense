@@ -11,7 +11,7 @@ kevin = 20:34;
 molly = [36,38,39,40,41,42,43,44,45,46,47,49,50,51];
 claire = [52,53,54,55,56,57,58,59,60,61,62,63];
 pablo = [64,65,66,67,68,69];
-winsize = .6;
+winsize = .3;
 fftbins = 30;
 
 %% Another method is to find the index that matches a search 
@@ -19,20 +19,22 @@ trialNums = [base,kevin,molly,claire,pablo];
 %trialNums = 23;
 
 for i = 1:length(trialNums)
-    ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
-    prepareDataResample(dataindex{ind,2},dataindex{ind,1},winsize,fftbins);
+   ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
+   %prepareDataResample(dataindex{ind,2},dataindex{ind,1},winsize,fftbins);
+   prepareData(dataindex{ind,2},dataindex{ind,1},winsize);
 end
+
 clear i ind
 
 %% example use of trainTest.m 
 %(trainNums,testNums,leaveout,featurelist,dataindex)
-trainNums  = [base(5:end),kevin,molly,claire,pablo];
-testNums   = [base(5:end),kevin,molly,claire,pablo]; 
+trainNums  = [base(5:end),molly,claire,pablo];
+testNums   = [kevin]; 
 dataindex  = getDataFolders;
-leaveout   = true;
+leaveout   = false;
 smooth     = true;
 %featurelist = (1:18);
-featurelist = 1:54;        %false means no special feautres, train all.
+featurelist = false;        %false means no special feautres, train all.
 
 %here's the function call
 [~, accuracy, predicted,tempCompare] = trainTest(trainNums,testNums,...

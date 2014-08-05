@@ -11,7 +11,7 @@
   <h1 id="videoTitle"> </h1> 
   <div>
     <video id="videoFrame" width="700px" src=
-    "data/6-hammer/6-video.webm" controls="true" />
+    "data/6-hammer/6-video.webm" controls seekable />
   </div>
   <div id="buttonbar">
       <button id="fastFwd" onclick="skip(3)">&gt;&gt;</button>
@@ -34,6 +34,7 @@
   // MAIN
   $(function(){
     var metadata = loadVideo();
+    console.log("metadata", metadata);
     loadD3(metadata);
     $("#classifyButton").click(function(){
       $('#annotationText').val(input.join('\n'));

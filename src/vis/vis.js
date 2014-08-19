@@ -75,7 +75,7 @@ function loadD3(metadata) {
 
   $("#videoFrame").on("timeupdate", function(t) {
     var video_time = t.currentTarget.currentTime;
-		console.log("Video Time: ", video_time);
+		//console.log("Video Time: ", video_time);
     var sensor_time = video_begin + video_time
     if ((video_begin + video_time) < sensor_begin) {
       drawCursor(0);

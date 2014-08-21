@@ -1,0 +1,31 @@
+<%= form_for(@tutorial_ingredient) do |f| %>
+  <% if @tutorial_ingredient.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@tutorial_ingredient.errors.count, "error") %> prohibited this tutorial_ingredient from being saved:</h2>
+
+      <ul>
+      <% @tutorial_ingredient.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :tutorial_id %><br>
+    <% f.number_field :tutorial_id %>
+    <%= select("tutorial_ingredient", "tutorial_id", Tutorial.all.collect {|t| [ t.name, t.id ] }) %>
+
+  </div>
+  <div class="field">
+    <%= f.label :tool_id %><br>
+    <%= select("tutorial_ingredient", "tool_id", Tool.all.collect {|t| [ t.name, t.id ] }) %>
+  </div>
+  <div class="field">
+    <%= f.label :order_marker %><br>
+    <%= f.number_field :order_marker %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

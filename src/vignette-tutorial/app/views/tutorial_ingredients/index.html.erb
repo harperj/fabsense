@@ -1,0 +1,29 @@
+<h1>Listing tutorial_ingredients</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tutorial</th>
+      <th>Tool</th>
+      <th>Order marker</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @tutorial_ingredients.each do |tutorial_ingredient| %>
+      <tr>
+        <td><%= tutorial_ingredient.tutorial_id %></td>
+        <td><%= tutorial_ingredient.tool_id %></td>
+        <td><%= tutorial_ingredient.order_marker %></td>
+        <td><%= link_to 'Show', tutorial_ingredient %></td>
+        <td><%= link_to 'Edit', edit_tutorial_ingredient_path(tutorial_ingredient) %></td>
+        <td><%= link_to 'Destroy', tutorial_ingredient, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Tutorial ingredient', new_tutorial_ingredient_path %>

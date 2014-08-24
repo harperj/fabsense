@@ -13,7 +13,7 @@ window.Whammy = (function(){
 		var info = checkFrames(frames);
 
 		//max duration by cluster in milliseconds
-		var CLUSTER_MAX_DURATION = 30000;
+		var CLUSTER_MAX_DURATION = 300000000;
 		
 		var EBML = [
 			{

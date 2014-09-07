@@ -52,30 +52,30 @@ def main(argv):
   #takes the subsample and filename as inputs.   
 
   try:
-    opts, args = getopt.getopt(argv,"hf:n:",["file=","subsample="])
+    opts, args = getopt.getopt(argv,"ht:n:",["trial=","subsample="])
   except getopt.GetoptError:
-    print '-f <##-tool>'
+    print '-t <trial#>'
     sys.exit(2)
   for opt, arg in opts:
     if opt == '-h':
-       print 'sample_csv.py -f <##-tool>  -n <subsample num>'
+       print 'sample_csv.py -t <##-tool>  -n <subsample num>'
        sys.exit()
-    elif opt in ("-f", "--file"):
+    elif opt in ("-t", "--trial"):
        outputfile = str(arg) 
     elif opt in ("-n","--verbose"):
       subsample  = int(arg)
 
-  print 'Output file is:', outputfile
+  print 'Trial Number is:', outputfile
   print 'Subsampling by a factor of: ', subsample
 
 
 
   if len(outputfile) is not 0:
     #split the input string
-    trial,name = outputfile.split('-')
+    #trial,name = outputfile.split('-')
 
-    filename = 'data/'+ outputfile + '/' + str(trial) +'-data.csv'
-    outfilename = 'data/'+ outputfile + '/' + str(trial) +'-sampled.csv'
+    filename = 'data/temporary-data/'+ outputfile +'-data.csv'
+    outfilename = 'data/temporary-data/'+ outputfile +'-sampled.csv'
 
     #function call
     sample_csv(filename,outfilename, subsample)

@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  tutorial_id: 1
+  tool_id: 1
+  order_marker: 1
+
+two:
+  tutorial_id: 1
+  tool_id: 1
+  order_marker: 1

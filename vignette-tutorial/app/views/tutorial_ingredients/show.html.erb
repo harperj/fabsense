@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Tutorial:</strong>
+  <%= @tutorial_ingredient.tutorial_id %>
+</p>
+
+<p>
+  <strong>Tool:</strong>
+  <%= @tutorial_ingredient.tool_id %>
+</p>
+
+<p>
+  <strong>Order marker:</strong>
+  <%= @tutorial_ingredient.order_marker %>
+</p>
+
+<%= link_to 'Edit', edit_tutorial_ingredient_path(@tutorial_ingredient) %> |
+<%= link_to 'Back', tutorial_ingredients_path %>

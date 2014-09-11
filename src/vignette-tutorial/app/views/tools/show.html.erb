@@ -1,0 +1,18 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @tool.name %>
+</p>
+
+<p>
+  <strong>Classifier:</strong>
+  <%= @tool.classifier_id %>
+</p>
+
+<p>
+  <strong>Image:</strong>
+  <%= image_tag(@tool.image_url, :width => 300) if @tool.image.present? %></p>
+
+<%= link_to 'Edit', edit_tool_path(@tool) %> |
+<%= link_to 'Back', tools_path %>

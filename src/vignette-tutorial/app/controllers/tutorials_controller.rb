@@ -9,6 +9,7 @@ class TutorialsController < ApplicationController
     @tutorials = Tutorial.all
   end
   def stream
+    # open file
     response.headers['Content-Type'] = 'text/event-stream'
     i = 0
     40.times do |x|

@@ -1,4 +1,9 @@
 <script>
+
+  var tools = <%= @tools.html_safe %>;
+  var list = <%= @tutorial_list %>;
+  var currentStep = 0;
+
 	var stream; 
 	$(function(){
 		stream = initEvent();
@@ -28,11 +33,10 @@
 		  }
 		}, false);
         return source;
-    }
+  }
 
-   var tools = <%= @tools.html_safe %>;
-   var list = <%= @tutorial_list %>;
-   var currentStep = 0;
+  
+
    function updateToolCount(id){
    		var tool = tools[id];
    		var badge = $('h3 .label[name="'+ tool +'"] strong');
@@ -62,6 +66,9 @@
    		el.find('.progress-bar').attr('aria-valuenow', amount).css('width', amount + '%');
    }
 </script>
+
+
+
 <h3><%= @tutorial.name %>
 	<% Tool.all.each do |t| %>
 		<span name="<%= t.name %>" class="label label-default"><%=t.name.humanize%> <strong> 0 </strong></span>

@@ -11,28 +11,29 @@ kevin = 20:34;
 molly = [36,38,39,40,41,42,43,44,45,46,47,49,50,51];
 claire = [52,53,54,55,56,57,58,59,60,61,62,63];
 pablo = [64,65,66,67,68,69];
-winsize = .3;
+winsize = .4;
 fftbins = 30;
 
+
 %% Another method is to find the index that matches a search 
-trialNums = [base,kevin,molly,claire,pablo];
+trialNums = [kevin,molly,claire,pablo];
 %trialNums = 23;
 
 for i = 1:length(trialNums)
    ind = find(cell2mat(dataindex(:,2)) == trialNums(i),1,'first');
-   %prepareDataResample(dataindex{ind,2},dataindex{ind,1},winsize,fftbins);
-   prepareData(dataindex{ind,2},dataindex{ind,1},winsize);
+   prepareDataResample(dataindex{ind,2},dataindex{ind,1},winsize,fftbins);
+   %prepareData(dataindex{ind,2},dataindex{ind,1},winsize);
 end
 
 clear i ind
 
 %% example use of trainTest.m 
 %(trainNums,testNums,leaveout,featurelist,dataindex)
-trainNums  = [base(5:end),molly,claire,pablo];
-testNums   = [kevin]; 
+trainNums  = [molly,claire,pablo];
+testNums   = [base]; 
 dataindex  = getDataFolders;
-leaveout   = false;
-smooth     = true;
+leaveout   = false;         %false means that you train classifier once
+smooth     = false;
 %featurelist = (1:18);
 featurelist = false;        %false means no special feautres, train all.
 
@@ -40,13 +41,64 @@ featurelist = false;        %false means no special feautres, train all.
 [~, accuracy, predicted,tempCompare] = trainTest(trainNums,testNums,...
     leaveout,featurelist,dataindex,winsize,smooth);
 
-fprintf('\n Whole test was: %5.3f \n \n', ...
+fprintf('\n Whole test was: %5.2f \n \n', ...
         mean(accuracy()*100));
     
 %% Obsolete code 
         
 %
 
+
+%% an automated leave-one-out user training-testing loop
+
+% make a structure of user names and trials
+user = struct();
+
+% lists of individual user's trials
+user.A = 20:34;
+user.B = [36,38,39,40,41,42,43,44,45,46,47,49,50,51];
+user.C = [52,53,54,55,56,57,58,59,60,61,62,63];
+user.D = [64,65,66,67,68,69];
+
+%basic accounting of users and trials
+userNames = {'A','B','C','D'};
+numUsers  = length(userNames);
+
+
+% here is the leave-one-out user training and testing
+for  i = 1:numUsers;
+    
+    fprintf('testing user: %s \n', userNames{i});
+    
+    %select just one user for Test Data
+    testNums = [user.(userNames{i})]; 
+    
+    %build an array of all training users
+    trainNames = userNames;
+    trainNames(i) = [];
+    
+    %build the list of user trials for training
+    trainNums = [];
+    for j = 1:numUsers-1;
+        trainNums = [trainNums,user.(trainNames{j})];
+    end
+    
+    %standard input variables to the trainTest function
+    dataindex  = getDataFolders;
+    leaveout   = false;         %false means that you train classifier once
+    smooth     = false;         %true applies a linear convolution
+    featurelist = false;        %false means no special feautres, train all.
+
+    %here's the function call
+    [~, accuracy, predicted,tempCompare] = ...
+        trainTest(trainNums,testNums,...
+        leaveout,featurelist,dataindex,winsize,smooth);
+
+    fprintf('\n Whole test was: %5.2f \n \n', ...
+    mean(accuracy()*100));
+    
+    
+end
 %% a linear search for an optimum
 
 winsizes = [.2,.4,.6,.8,1,1.5];
